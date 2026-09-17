@@ -307,3 +307,12 @@ def analyze_file(
             "error": str(exc)
         }
 
+
+
+@mcp.resource(
+    "repo://structure"
+)
+def repository_structure_resource() -> str:
+    
+
+    return get_project_structure()
