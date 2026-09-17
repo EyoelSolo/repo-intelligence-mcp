@@ -316,3 +316,13 @@ def repository_structure_resource() -> str:
     
 
     return get_project_structure()
+
+@mcp.resource(
+    "repo://statistics"
+)
+def repository_statistics_resource() -> dict:
+    """
+    Repository statistics.
+    """
+
+    return repository_info()
