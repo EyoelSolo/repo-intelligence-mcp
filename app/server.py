@@ -75,3 +75,29 @@ def get_project_structure() -> str:
         return "No JavaScript/TypeScript files found."
 
     return "\n".join(paths)
+@mcp.tool()
+def search_code(
+    query: str,
+    limit: int = 20,
+) -> list[dict]:
+    """
+    Search JavaScript/TypeScript source code.
+
+    Args:
+        query: Text to search for.
+        limit: Maximum number of results.
+    """
+
+    if not query.strip():
+        return []
+
+    limit = max(
+        1,
+        min(limit, 100),
+    )
+
+    return search_engine.search(
+        query=query,
+        limit=limit,
+    )
+
