@@ -15,3 +15,16 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+
+#configuration
+REPOSITORY_PATH = Path(
+   
+    "./demo-repository"
+)
+
+config = Config(REPOSITORY_PATH)
+
+scanner = RepositoryScanner(config)
+parser = CodeParser()
+search_engine = SearchEngine(config)
