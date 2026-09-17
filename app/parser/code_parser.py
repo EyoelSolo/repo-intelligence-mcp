@@ -20,3 +20,18 @@ class Import:
     source: str
     file: str
     start_line: int
+
+
+class CodeParser:
+
+    def __init__(self):
+        self.javascript_language = Language(
+            tree_sitter_javascript.language()
+        )
+
+        self.typescript_language = Language(
+            tree_sitter_typescript.language_typescript()
+        )
+
+        self.tsx_language = Language(
+            tree_sitter_typescript.language_tsx()
