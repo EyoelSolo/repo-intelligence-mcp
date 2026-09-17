@@ -35,3 +35,16 @@ class CodeParser:
 
         self.tsx_language = Language(
             tree_sitter_typescript.language_tsx())
+
+        def get_parser(self, language: str) -> Parser:
+
+            if language == "javascript":
+                return Parser(self.javascript_language)
+
+            if language == "typescript":
+                return Parser(self.typescript_language)
+
+            if language == "tsx":
+                return Parser(self.tsx_language)
+
+            raise ValueError(f"Unsupported language: {language}")
