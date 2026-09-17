@@ -21,3 +21,10 @@ class SearchResult:
             "line": self.line,
             "content": self.content,
         }
+
+    
+class SearchEngine:
+
+    def __init__(self, config: Config):
+        self.config = config
+        self.scanner = RepositoryScanner(config)
