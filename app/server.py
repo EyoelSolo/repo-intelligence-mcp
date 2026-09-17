@@ -28,3 +28,33 @@ config = Config(REPOSITORY_PATH)
 scanner = RepositoryScanner(config)
 parser = CodeParser()
 search_engine = SearchEngine(config)
+
+#mcp server
+mcp = MCPServer(
+    "Repository Intelligence"
+)
+
+
+#repository information
+
+@mcp.tool()
+def repository_info() -> dict:
+    """
+    Return basic information about the repository.
+    """
+
+    files = scanner.scan()
+
+    languages = {}
+
+    for file in files:
+        languages[file.language] = (
+            languages.get(file.language, 0) + 1
+        )
+
+    return {
+        "repository": str(config.repository_root),
+        "total_supported_files": len(files),
+        "languages": languages,
+    }
+
