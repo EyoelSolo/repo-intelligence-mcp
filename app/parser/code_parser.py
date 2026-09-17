@@ -34,4 +34,4 @@ class CodeParser:
         )
 
         self.tsx_language = Language(
-            tree_sitter_typescript.language_tsx()
+            tree_sitter_typescript.language_tsx())
