@@ -70,3 +70,91 @@ class CodeParser:
             tree = self.parse_file(path, language)
 
             symbols: list[Symbol] = []
+            def walk(node):
+
+                node_type = node.type
+
+                symbol_name = None
+                symbol_kind = None
+
+                if node_type in {
+                    "function_declaration",
+                    "generator_function_declaration",
+                }:
+                    symbol_kind = "function"
+
+                    name_node = node.child_by_field_name("name")
+
+                    if name_node:
+                        symbol_name = name_node.text.decode(
+                            "utf-8",
+                            errors="replace",
+                        )
+
+                elif node_type in {
+                    "class_declaration",
+                }:
+                    symbol_kind = "class"
+
+                    name_node = node.child_by_field_name("name")
+
+                    if name_node:
+                        symbol_name = name_node.text.decode(
+                            "utf-8",
+                            errors="replace",
+                        )
+
+                elif node_type in {
+                    "interface_declaration",
+                    "type_alias_declaration",
+                    "enum_declaration",
+                }:
+                    symbol_kind = "type"
+
+                    name_node = node.child_by_field_name("name")
+
+                    if name_node:
+                        symbol_name = name_node.text.decode(
+                            "utf-8",
+                            errors="replace",
+                        )
+
+                elif node_type == "method_definition":
+                    symbol_kind = "method"
+
+                    name_node = node.child_by_field_name("name")
+
+                    if name_node:
+                        symbol_name = name_node.text.decode(
+                            "utf-8",
+                            errors="replace",
+                        )
+
+                if symbol_name:
+                    symbols.append(
+                        Symbol(
+                            name=symbol_name,
+                            kind=symbol_kind,
+                            file=str(path),
+                            start_line=node.start_point.row + 1,
+                            end_line=node.end_point.row + 1,
+                        )
+                    )
+
+                for child in node.children:
+                    walk(child)
+
+            walk(tree.root_node)
+
+            return symbols
+
+        def extract_imports(
+            self,
+            path: Path,
+            language: str,
+        ) -> list[Import]:
+
+            source = path.read_bytes()
+            tree = self.parse_file(path, language)
+
+            imports: list
