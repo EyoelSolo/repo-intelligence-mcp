@@ -230,3 +230,80 @@ def find_symbol(
 
     return results
 
+@mcp.tool()
+def analyze_file(
+    path: str,
+) -> dict:
+    """
+    Analyze a JavaScript/TypeScript file using Tree-sitter.
+    """
+
+    try:
+        file_path = safe_path(
+            config.repository_root,
+            path,
+        )
+
+    except SecurityError as exc:
+        return {
+            "error": str(exc)
+        }
+
+    if not file_path.exists():
+        return {
+            "error": f"File not found: {path}"
+        }
+
+    from app.repository.detector import detect_language
+
+    language = detect_language(file_path)
+
+    if language is None:
+        return {
+            "error": "Unsupported file type."
+        }
+
+    try:
+
+        symbols = parser.extract_symbols(
+            file_path,
+            language,
+        )
+
+        imports = parser.extract_imports(
+            file_path,
+            language,
+        )
+
+        return {
+            "file": path,
+            "language": language,
+            "symbols": [
+                {
+                    "name": symbol.name,
+                    "kind": symbol.kind,
+                    "start_line": symbol.start_line,
+                    "end_line": symbol.end_line,
+                }
+                for symbol in symbols
+            ],
+            "imports": [
+                {
+                    "source": item.source,
+                    "line": item.start_line,
+                }
+                for item in imports
+            ],
+        }
+
+    except Exception as exc:
+
+        logger.exception(
+            "Analysis failed for %s",
+            path,
+        )
+
+        return {
+            "error": str(exc)
+        }
+
