@@ -158,4 +158,29 @@ class CodeParser:
         tree = self.parse_file(path, language)
 
         imports: list[Import] =[]
-        
+        def walk(node):
+
+            if node.type == "import_statement":
+
+                source_node = node.child_by_field_name("source")
+
+                if source_node:
+                    value = source_node.text.decode(
+                        "utf-8",
+                        errors="replace",
+                    )
+
+                    imports.append(
+                        Import(
+                            source=value.strip("\"'"),
+                            file=str(path),
+                            start_line=node.start_point.row + 1,
+                        )
+                    )
+
+            for child in node.children:
+                walk(child)
+
+        walk(tree.root_node)
+
+        return imports
