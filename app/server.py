@@ -326,3 +326,21 @@ def repository_statistics_resource() -> dict:
     """
 
     return repository_info()
+
+
+
+def main():
+    logger.info(
+        "Starting Repository Intelligence MCP server"
+    )
+
+    logger.info(
+        "Repository: %s",
+        config.repository_root,
+    )
+
+    mcp.run()
+
+
+if __name__ == "__main__":
+    main()
