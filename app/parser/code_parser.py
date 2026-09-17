@@ -48,3 +48,14 @@ class CodeParser:
                 return Parser(self.tsx_language)
 
             raise ValueError(f"Unsupported language: {language}")
+
+        def parse_file(
+            self,
+            path: Path,
+            language: str,
+        ):
+            parser = self.get_parser(language)
+
+            source = path.read_bytes()
+
+            return parser.parse(source)
