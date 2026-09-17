@@ -101,3 +101,132 @@ def search_code(
         limit=limit,
     )
 
+
+
+
+@mcp.tool()
+def get_file(
+    path: str,
+    start_line: int = 1,
+    end_line: int = 200,
+) -> str:
+    """
+    Read a source file from the repository.
+
+    Only JavaScript/TypeScript files are currently supported.
+    """
+
+    try:
+        file_path = safe_path(
+            config.repository_root,
+            path,
+        )
+
+    except SecurityError as exc:
+        return str(exc)
+
+    if not file_path.exists():
+        return f"File not found: {path}"
+
+    if not file_path.is_file():
+        return f"Not a file: {path}"
+
+    language = scanner
+
+    from app.repository.detector import detect_language
+
+    detected = detect_language(file_path)
+
+    if detected is None:
+        return (
+            "Unsupported file type. "
+            "Only JavaScript and TypeScript "
+            "files are currently supported."
+        )
+
+    try:
+        lines = file_path.read_text(
+            encoding="utf-8",
+            errors="replace",
+        ).splitlines()
+
+    except OSError as exc:
+        return f"Could not read file: {exc}"
+
+    start_line = max(1, start_line)
+    end_line = min(
+        len(lines),
+        end_line,
+    )
+
+    if start_line > end_line:
+        return "Invalid line range."
+
+    selected = lines[
+        start_line - 1:end_line
+    ]
+
+    output = []
+
+    for number, line in enumerate(
+        selected,
+        start=start_line,
+    ):
+        output.append(
+            f"{number:>5} | {line}"
+        )
+
+    return "\n".join(output)
+
+
+# ---------------------------------------------------------
+# Tool: find symbol
+# ---------------------------------------------------------
+
+@mcp.tool()
+def find_symbol(
+    symbol_name: str,
+) -> list[dict]:
+    """
+    Find classes, functions, methods, interfaces,
+    types, and enums in the repository.
+    """
+
+    results = []
+
+    files = scanner.scan()
+
+    for file in files:
+
+        path = Path(file.absolute_path)
+
+        try:
+            symbols = parser.extract_symbols(
+                path,
+                file.language,
+            )
+
+        except Exception as exc:
+            logger.warning(
+                "Could not parse %s: %s",
+                file.path,
+                exc,
+            )
+            continue
+
+        for symbol in symbols:
+
+            if symbol.name.lower() == symbol_name.lower():
+
+                results.append(
+                    {
+                        "name": symbol.name,
+                        "kind": symbol.kind,
+                        "file": file.path,
+                        "start_line": symbol.start_line,
+                        "end_line": symbol.end_line,
+                    }
+                )
+
+    return results
+
