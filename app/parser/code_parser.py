@@ -147,14 +147,15 @@ class CodeParser:
             walk(tree.root_node)
 
             return symbols
+    
+    def extract_imports(
+        self,
+        path: Path,
+        language: str,
+    ) -> list[Import]:
 
-        def extract_imports(
-            self,
-            path: Path,
-            language: str,
-        ) -> list[Import]:
+        source = path.read_bytes()
+        tree = self.parse_file(path, language)
 
-            source = path.read_bytes()
-            tree = self.parse_file(path, language)
-
-            imports: list
+        imports: list[Import] =[]
+        
