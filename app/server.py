@@ -58,3 +58,20 @@ def repository_info() -> dict:
         "languages": languages,
     }
 
+@mcp.tool()
+def get_project_structure() -> str:
+    """
+    Return the JavaScript/TypeScript project structure.
+    """
+
+    files = scanner.scan()
+
+    paths = sorted(
+        file.path
+        for file in files
+    )
+
+    if not paths:
+        return "No JavaScript/TypeScript files found."
+
+    return "\n".join(paths)
