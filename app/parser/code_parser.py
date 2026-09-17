@@ -59,3 +59,14 @@ class CodeParser:
             source = path.read_bytes()
 
             return parser.parse(source)
+
+        def extract_symbols(
+            self,
+            path: Path,
+            language: str,
+        ) -> list[Symbol]:
+
+            source = path.read_bytes()
+            tree = self.parse_file(path, language)
+
+            symbols: list[Symbol] = []
