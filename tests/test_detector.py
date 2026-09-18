@@ -29,3 +29,8 @@ def test_javascript_helper():
     assert is_javascript(
         Path("server.js")
 )
+
+def test_typescript_helper():
+    assert is_typescript(
+        Path("server.ts")
+    )
