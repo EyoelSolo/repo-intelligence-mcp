@@ -34,3 +34,11 @@ def test_typescript_helper():
     assert is_typescript(
         Path("server.ts")
     )
+
+
+
+def test_unknown_language():
+    assert (
+        detect_language(Path("main.py"))
+        is None
+    )
