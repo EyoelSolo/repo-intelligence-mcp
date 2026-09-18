@@ -24,3 +24,8 @@ def test_typescript_detection():
         detect_language(Path("app.ts"))
         == "typescript"
 )
+
+def test_javascript_helper():
+    assert is_javascript(
+        Path("server.js")
+)
