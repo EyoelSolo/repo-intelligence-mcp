@@ -11,3 +11,9 @@ def test_javascript_detection():
         detect_language(Path("app.js"))
         == "javascript"
     )
+
+def test_jsx_detection():
+    assert (
+        detect_language(Path("App.jsx"))
+        == "javascript"
+    )
