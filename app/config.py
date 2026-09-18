@@ -4,7 +4,7 @@ from pathlib import Path
 
 @dataclass
 class Config: 
-    repository_root: path
+    repository_root: Path
 
 
     ignored_directories: tuple [str, ...] = (
