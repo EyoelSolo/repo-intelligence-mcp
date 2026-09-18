@@ -22,3 +22,17 @@ def test_safe_path(tmp_path):
     assert result == (
         root / "src/app.ts"
     ).resolve()
+
+
+def test_parent_traversal_is_blocked(tmp_path):
+
+    root = tmp_path / "repo"
+
+    root.mkdir()
+
+    with pytest.raises(SecurityError):
+
+        safe_path(
+            root,
+            "../../secret.txt",
+        )
