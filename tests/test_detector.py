@@ -34,6 +34,9 @@ def test_mjs_detection():
 def test_cjs_detection():
     assert detect_language(Path("app.cjs")) == "javascript"
 
+def test_mts_detection():
+    assert detect_language(Path("app.mts")) == "typescript"
+
 def test_javascript_helper():
     assert is_javascript(
         Path("server.js")
