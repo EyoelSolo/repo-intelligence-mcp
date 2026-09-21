@@ -27,6 +27,10 @@ def test_typescript_detection():
 
 def test_tsx_detection():
     assert detect_language(Path("App.tsx")) == "tsx"
+    
+def test_mjs_detection():
+    assert detect_language(Path("app.mjs")) == "javascript"
+
 
 def test_javascript_helper():
     assert is_javascript(
