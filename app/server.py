@@ -8,6 +8,8 @@ from app.parser.code_parser import CodeParser
 from app.repository.scanner import RepositoryScanner
 from app.repository.security import safe_path, SecurityError
 from app.search.search_engine import SearchEngine
+from app.repository.detector import detect_language
+
 
 
 logging.basicConfig(
@@ -131,9 +133,7 @@ def get_file(
     if not file_path.is_file():
         return f"Not a file: {path}"
 
-    language = scanner
 
-    from app.repository.detector import detect_language
 
     detected = detect_language(file_path)
 

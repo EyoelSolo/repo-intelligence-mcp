@@ -26,7 +26,7 @@ class Config:
         ".env",
         ".env.local",
         ".env.production",
-        ".env.developenent",
+        ".env.development",
         ".env.test",
         "id_rsa",
         "id_ed25519",
