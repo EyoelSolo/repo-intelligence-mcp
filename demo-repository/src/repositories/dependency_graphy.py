@@ -93,3 +93,30 @@ class DependencyGraph:
         # could resolve to:
         #
         # services/index.ts
+        index_files = [
+            "index.ts",
+            "index.tsx",
+            "index.js",
+            "index.jsx",
+        ]
+
+        for index_file in index_files:
+
+            possible_file = candidate / index_file
+
+            try:
+                relative = possible_file.relative_to(
+                    self.scanner.config.repository_root
+                )
+
+            except ValueError:
+                continue
+
+            relative_string = str(
+                relative
+            ).replace("\\", "/")
+
+            if relative_string in file_index:
+                return relative_string
+
+        
