@@ -92,7 +92,16 @@ def get_dependents(
     Return repository files that depend on the specified file.
     """
 
-    
+    try:
+        safe_path(
+            config.repository_root,
+            path,
+        )
+
+    except SecurityError as exc:
+        return [str(exc)]
+
+    return dependency_graph.get_dependents(path)
 
 @mcp.tool()
 def get_project_structure() -> str:
