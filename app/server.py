@@ -65,6 +65,24 @@ def repository_info() -> dict:
         "total_supported_files": len(files),
         "languages": languages,
     }
+@mcp.tool()
+def get_dependencies(
+    path: str,
+) -> list[str]:
+    """
+    Return local repository files imported by a file.
+    """
+
+    try:
+        safe_path(
+            config.repository_root,
+            path,
+        )
+
+    except SecurityError as exc:
+        return [str(exc)]
+
+    return dependency_graph.get_dependencies(path)
 
 @mcp.tool()
 def get_project_structure() -> str:
