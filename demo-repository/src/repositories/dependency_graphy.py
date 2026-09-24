@@ -119,4 +119,4 @@ class DependencyGraph:
             if relative_string in file_index:
                 return relative_string
 
-        
+        return None
