@@ -48,3 +48,20 @@ class DependencyGraph:
         #
         if not import_source.startswith("."):
             return None
+        base_directory = importing_file.parent
+
+        candidate = (
+            base_directory / import_source
+        ).resolve()
+
+        extensions = [
+            "",
+            ".ts",
+            ".tsx",
+            ".js",
+            ".jsx",
+            ".mts",
+            ".cts",
+            ".mjs",
+            ".cjs",
+        ]
