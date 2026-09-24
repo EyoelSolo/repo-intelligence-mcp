@@ -32,6 +32,10 @@ config = Config(REPOSITORY_PATH)
 scanner = RepositoryScanner(config)
 parser = CodeParser()
 search_engine = SearchEngine(config)
+dependency_graph = DependencyGraph(
+    scanner,
+    parser,
+)
 
 #mcp server
 mcp = MCPServer(
