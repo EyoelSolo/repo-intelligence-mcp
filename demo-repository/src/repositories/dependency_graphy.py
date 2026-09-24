@@ -161,7 +161,7 @@ class DependencyGraph:
                 dependencies.append(resolved)
 
         return sorted(set(dependencies))
-        def get_dependents(
+    def get_dependents(
         self,
         relative_path: str,
     ) -> list[str]:
