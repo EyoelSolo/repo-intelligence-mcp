@@ -120,3 +120,30 @@ class DependencyGraph:
                 return relative_string
 
         return None
+
+    def get_dependencies(
+        self,
+        relative_path: str,
+    ) -> list[str]:
+
+        file_index = self.build_file_index()
+
+        normalized_path = relative_path.replace(
+            "\\",
+            "/",
+        )
+
+        if normalized_path not in file_index:
+            return []
+
+        file_path = file_index[normalized_path]
+
+        language = detect_language(file_path)
+
+        if language is None:
+            return []
+
+        imports = self.parser.extract_imports(
+            file_path,
+            language,
+        )
