@@ -1,7 +1,7 @@
 import logging
 
-from app.repository.dependency_graph import DependencyGraph
 from pathlib import Path
+from app.repository.dependency_graph import DependencyGraph
 
 from mcp.server.mcpserver import MCPServer
 
