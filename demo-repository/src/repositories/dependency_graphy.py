@@ -147,3 +147,17 @@ class DependencyGraph:
             file_path,
             language,
         )
+        dependencies = []
+
+        for import_item in imports:
+
+            resolved = self.resolve_import(
+                file_path,
+                import_item.source,
+                file_index,
+            )
+
+            if resolved is not None:
+                dependencies.append(resolved)
+
+        return sorted(set(dependencies))
