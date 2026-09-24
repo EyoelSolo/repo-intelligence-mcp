@@ -29,3 +29,22 @@ class DependencyGraph:
             )
 
         return index
+    def resolve_import(
+        self,
+        importing_file: Path,
+        import_source: str,
+        file_index: dict[str, Path],
+    ) -> str | None:
+        """
+        Resolve a relative JavaScript/TypeScript import
+        to a repository-relative file.
+        """
+
+        # Ignore external packages such as:
+        #
+        # react
+        # express
+        # axios
+        #
+        if not import_source.startswith("."):
+            return None
