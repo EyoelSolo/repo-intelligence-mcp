@@ -85,6 +85,16 @@ def get_dependencies(
     return dependency_graph.get_dependencies(path)
 
 @mcp.tool()
+def get_dependents(
+    path: str,
+) -> list[str]:
+    """
+    Return repository files that depend on the specified file.
+    """
+
+    
+
+@mcp.tool()
 def get_project_structure() -> str:
     """
     Return the JavaScript/TypeScript project structure.
