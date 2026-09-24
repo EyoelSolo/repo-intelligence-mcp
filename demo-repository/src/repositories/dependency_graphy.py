@@ -161,7 +161,7 @@ class DependencyGraph:
                 dependencies.append(resolved)
 
         return sorted(set(dependencies))
-    def get_dependents(
+        def get_dependents(
         self,
         relative_path: str,
     ) -> list[str]:
@@ -175,4 +175,11 @@ class DependencyGraph:
 
         file_index = self.build_file_index()
 
-        
+        for file in file_index:
+
+            dependencies = self.get_dependencies(file)
+
+            if normalized_path in dependencies:
+                dependents.append(file)
+
+        return sorted(set(dependents))
