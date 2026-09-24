@@ -1,4 +1,6 @@
 import logging
+
+from app.repository.dependency_graph import DependencyGraph
 from pathlib import Path
 
 from mcp.server.mcpserver import MCPServer
