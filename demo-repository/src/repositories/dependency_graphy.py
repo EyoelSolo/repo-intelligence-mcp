@@ -161,3 +161,18 @@ class DependencyGraph:
                 dependencies.append(resolved)
 
         return sorted(set(dependencies))
+    def get_dependents(
+        self,
+        relative_path: str,
+    ) -> list[str]:
+
+        normalized_path = relative_path.replace(
+            "\\",
+            "/",
+        )
+
+        dependents = []
+
+        file_index = self.build_file_index()
+
+        
