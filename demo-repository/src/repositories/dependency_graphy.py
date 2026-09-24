@@ -65,3 +65,31 @@ class DependencyGraph:
             ".mjs",
             ".cjs",
         ]
+        for extension in extensions:
+
+            possible_file = Path(
+                str(candidate) + extension
+            )
+
+            try:
+                relative = possible_file.relative_to(
+                    self.scanner.config.repository_root
+                )
+
+            except ValueError:
+                continue
+
+            relative_string = str(
+                relative
+            ).replace("\\", "/")
+
+            if relative_string in file_index:
+                return relative_string
+
+        # Try directory imports:
+        #
+        # import "./services"
+        #
+        # could resolve to:
+        #
+        # services/index.ts
