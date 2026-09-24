@@ -1,3 +1,5 @@
+import { UserService } from "../services/user_service";
+
 export class UserRepository {
 
     async findById(id: string) {
