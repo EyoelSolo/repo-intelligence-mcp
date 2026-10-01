@@ -111,3 +111,51 @@ class DependencyGraph:
                 return relative_path
 
         return None
+    def build(self) -> None:
+        """
+        Build the complete dependency graph.
+        """
+
+        self.build_file_index()
+
+        self.dependencies = {
+            path: set()
+            for path in self.file_index
+        }
+
+        self.dependents = {
+            path: set()
+            for path in self.file_index
+        }
+
+        for relative_path, file_path in self.file_index.items():
+
+            language = detect_language(file_path)
+
+            if language is None:
+                continue
+
+            try:
+                imports = self.parser.extract_imports(
+                    file_path,
+                    language,
+                )
+            except Exception:
+                continue
+            for import_item in imports:
+
+                resolved = self.resolve_import(
+                    file_path,
+                    import_item.source,
+                )
+
+                if resolved is None:
+                    continue
+
+                self.dependencies[
+                    relative_path
+                ].add(resolved)
+
+                self.dependents[
+                    resolved
+                ].add(relative_path)
