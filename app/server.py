@@ -36,7 +36,7 @@ dependency_graph = DependencyGraph(
     scanner,
     parser,
 )
-
+dependency_graph.build()
 #mcp server
 mcp = MCPServer(
     "Repository Intelligence"
