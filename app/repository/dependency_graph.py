@@ -29,7 +29,7 @@ class DependencyGraph:
             self.file_index[relative_path] = Path(
                 file.absolute_path
             )
-     def resolve_import(
+    def resolve_import(
         self,
         importing_file: Path,
         import_source: str,
@@ -65,3 +65,23 @@ class DependencyGraph:
             ".mjs",
             ".cjs",
         ]
+         for extension in extensions:
+
+            possible_file = Path(
+                str(candidate) + extension
+            )
+
+            try:
+                relative = possible_file.relative_to(
+                    self.scanner.config.repository_root
+                )
+            except ValueError:
+                continue
+
+            relative_path = str(relative).replace(
+                "\\",
+                "/",
+            )
+
+            if relative_path in self.file_index:
+                return relative_path
