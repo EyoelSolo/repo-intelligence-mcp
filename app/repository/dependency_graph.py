@@ -15,3 +15,17 @@ class DependencyGraph:
         self.file_index: dict[str, Path] = {}
         self.dependencies: dict[str, set[str]] = {}
         self.dependents: dict[str, set[str]] = {}
+    def build_file_index(self) -> None:
+        """
+        Build a mapping between repository-relative paths
+        and absolute filesystem paths.
+        """
+
+        self.file_index.clear()
+
+        for file in self.scanner.scan():
+            relative_path = file.path.replace("\\", "/")
+
+            self.file_index[relative_path] = Path(
+                file.absolute_path
+            )
