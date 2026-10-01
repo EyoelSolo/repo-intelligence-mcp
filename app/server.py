@@ -351,6 +351,26 @@ def analyze_file(
         }
 
 
+@mcp.tool()
+def get_dependency_graph() -> dict:
+    """
+    Return the complete repository dependency graph.
+    """
+
+    return {
+        "nodes": sorted(
+            dependency_graph.file_index.keys()
+        ),
+        "edges": [
+            {
+                "from": source,
+                "to": target,
+            }
+            for source, targets
+            in dependency_graph.dependencies.items()
+            for target in sorted(targets)
+        ],
+    }
 
 @mcp.resource(
     "repo://structure"
