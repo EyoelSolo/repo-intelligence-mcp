@@ -177,3 +177,19 @@ class DependencyGraph:
                 set(),
             )
         )
+    def get_dependents(
+        self,
+        path: str,
+    ) -> list[str]:
+
+        normalized = path.replace("\\", "/")
+
+        if normalized not in self.file_index:
+            return []
+
+        return sorted(
+            self.dependents.get(
+                normalized,
+                set(),
+            )
+        )
