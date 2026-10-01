@@ -65,7 +65,7 @@ class DependencyGraph:
             ".mjs",
             ".cjs",
         ]
-         for extension in extensions:
+        for extension in extensions:
 
             possible_file = Path(
                 str(candidate) + extension
@@ -85,3 +85,29 @@ class DependencyGraph:
 
             if relative_path in self.file_index:
                 return relative_path
+            
+        for index_name in (
+            "index.ts",
+            "index.tsx",
+            "index.js",
+            "index.jsx",
+        ):
+
+            possible_file = candidate / index_name
+
+            try:
+                relative = possible_file.relative_to(
+                    self.scanner.config.repository_root
+                )
+            except ValueError:
+                continue
+
+            relative_path = str(relative).replace(
+                "\\",
+                "/",
+            )
+
+            if relative_path in self.file_index:
+                return relative_path
+
+        return None
