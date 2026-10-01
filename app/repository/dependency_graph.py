@@ -29,3 +29,39 @@ class DependencyGraph:
             self.file_index[relative_path] = Path(
                 file.absolute_path
             )
+     def resolve_import(
+        self,
+        importing_file: Path,
+        import_source: str,
+    ) -> str | None:
+        """
+        Resolve a local JavaScript/TypeScript import
+        to a repository-relative path.
+        """
+
+        # External packages:
+        #
+        # react
+        # express
+        # axios
+        #
+        # are not repository dependencies.
+
+        if not import_source.startswith("."):
+            return None
+
+        candidate = (
+            importing_file.parent / import_source
+        ).resolve()
+
+        extensions = [
+            "",
+            ".ts",
+            ".tsx",
+            ".js",
+            ".jsx",
+            ".mts",
+            ".cts",
+            ".mjs",
+            ".cjs",
+        ]
