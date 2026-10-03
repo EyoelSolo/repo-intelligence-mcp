@@ -4,6 +4,7 @@ from pathlib import Path
 from app.repository.dependency_graph import DependencyGraph
 
 from mcp.server.mcpserver import MCPServer
+from app.repository.impact_analyzer import ImpactAnalyzer
 
 from app.config import Config
 from app.parser.code_parser import CodeParser
@@ -42,7 +43,9 @@ mcp = MCPServer(
     "Repository Intelligence"
 )
 
-
+impact_analyzer = ImpactAnalyzer(
+    dependency_graph
+)
 #repository information
 
 @mcp.tool()
