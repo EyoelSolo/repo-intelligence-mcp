@@ -36,3 +36,30 @@ class ImpactAnalyzer:
         visited = {
             normalized
         }
+        while queue:
+
+            current, depth = queue.popleft()
+
+            if depth >= max_depth:
+                continue
+
+            for dependent in self.graph.dependents.get(
+                current,
+                set(),
+            ):
+
+                if dependent in visited:
+                    continue
+
+                visited.add(dependent)
+
+                affected[
+                    dependent
+                ] = depth + 1
+
+                queue.append(
+                    (
+                        dependent,
+                        depth + 1,
+                    )
+                )
