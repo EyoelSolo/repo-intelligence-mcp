@@ -76,3 +76,17 @@ class ImpactAnalyzer:
             for path, depth in affected.items()
             if depth > 1
         ]
+        return {
+            "file": normalized,
+            "direct_dependents": sorted(direct),
+            "indirect_dependents": sorted(
+                indirect,
+                key=lambda item: (
+                    item["depth"],
+                    item["file"],
+                ),
+            ),
+            "total_affected_files": len(
+                affected
+            ),
+        }
