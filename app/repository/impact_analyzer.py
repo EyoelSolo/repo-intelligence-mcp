@@ -18,3 +18,7 @@ class ImpactAnalyzer:
     ) -> dict:
 
         normalized = path.replace("\\", "/")
+        if normalized not in self.graph.file_index:
+            return {
+                "error": f"File not found in repository: {path}"
+            }
