@@ -407,6 +407,35 @@ def main():
 
     mcp.run()
 
+@mcp.tool()
+def analyze_change_impact(
+    path: str,
+    max_depth: int = 10,
+) -> dict:
+    """
+    Analyze which repository files could be affected
+    if the specified file changes.
+    """
+
+    try:
+        safe_path(
+            config.repository_root,
+            path,
+        )
+    except SecurityError as exc:
+        return {
+            "error": str(exc)
+        }
+
+    max_depth = max(
+        1,
+        min(max_depth, 20),
+    )
+
+    return impact_analyzer.analyze(
+        path,
+        max_depth,
+    )
 
 if __name__ == "__main__":
     main()
