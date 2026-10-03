@@ -22,3 +22,17 @@ class ImpactAnalyzer:
             return {
                 "error": f"File not found in repository: {path}"
             }
+        affected: dict[str, int] = {}
+
+        queue = deque()
+
+        queue.append(
+            (
+                normalized,
+                0,
+            )
+        )
+
+        visited = {
+            normalized
+        }
