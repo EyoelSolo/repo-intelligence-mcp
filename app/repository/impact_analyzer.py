@@ -68,3 +68,11 @@ class ImpactAnalyzer:
             for path, depth in affected.items()
             if depth == 1
         ]
+        indirect = [
+            {
+                "file": path,
+                "depth": depth,
+            }
+            for path, depth in affected.items()
+            if depth > 1
+        ]
