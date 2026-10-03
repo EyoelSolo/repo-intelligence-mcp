@@ -63,3 +63,8 @@ class ImpactAnalyzer:
                         depth + 1,
                     )
                 )
+        direct = [
+            path
+            for path, depth in affected.items()
+            if depth == 1
+        ]
