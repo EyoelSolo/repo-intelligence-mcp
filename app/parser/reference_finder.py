@@ -121,3 +121,14 @@ class ReferenceFinder:
                         if line_index < len(source_lines)
                         else ""
                     )
+
+                    results.append(
+                        Reference(
+                            name=symbol_name,
+                            file=file_info.path,
+                            line=line_index + 1,
+                            kind=self.classify(node),
+                            text=line_text,
+                        )
+                    )
+                    return
