@@ -30,3 +30,11 @@ def test_finds_function_definition_and_call(tmp_path):
         "definition",
         "call",
     }
+
+def test_ignores_comments_and_strings(tmp_path):
+    (tmp_path / "example.ts").write_text(
+        '// getUser is mentioned here\n'
+        'const message = "getUser";\n'
+        'getUser();\n',
+        encoding="utf-8",
+    )
