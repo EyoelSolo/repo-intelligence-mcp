@@ -77,3 +77,11 @@ class ReferenceFinder:
             return "import_or_export"
 
         return "identifier"
+    def find_references(
+        self,
+        symbol_name: str,
+        limit: int = 100,
+    ) -> list[dict]:
+        symbol_name = symbol_name.strip()
+        if not symbol_name:
+            return []
