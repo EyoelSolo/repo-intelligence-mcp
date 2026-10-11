@@ -43,3 +43,13 @@ def test_ignores_comments_and_strings(tmp_path):
     assert len(results) == 1
     assert results[0]["kind"] == "call"
     assert results[0]["line"] == 3
+    
+def test_returns_relative_path_and_line(tmp_path):
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    (source_dir / "app.ts").write_text(
+        "\ngetUser();\n",
+        encoding="utf-8",
+    )
+
+    results = make_finder(tmp_path).find_references("getUser")
