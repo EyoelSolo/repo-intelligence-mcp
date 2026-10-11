@@ -132,3 +132,15 @@ class ReferenceFinder:
                         )
                     )
                     return
+                for child in node.children:
+                    walk(child)
+
+                walk(tree.root_node)
+
+                if len(results) >= limit:
+                    break
+
+        return [
+            asdict(reference)
+            for reference in results
+        ]
