@@ -39,3 +39,17 @@ class ReferenceFinder:
     ):
         self.scanner = scanner
         self.parser = parser
+
+    def classify(self, node) -> str:
+        parent = node.parent
+        if parent is None:
+            return "identifier"
+
+        # Is this identifier the name declared by its parent?
+        name_node = parent.child_by_field_name("name")
+        if (
+            parent.type in self.DEFINITION_TYPES
+            and name_node is not None
+            and name_node.id == node.id
+        ):
+            return "definition"
