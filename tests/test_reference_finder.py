@@ -59,3 +59,15 @@ def test_returns_relative_path_and_line(tmp_path):
 
 def test_empty_query_returns_no_results(tmp_path):
     assert make_finder(tmp_path).find_references("  ") == []    
+
+def test_limit_is_respected(tmp_path):
+    (tmp_path / "example.ts").write_text(
+        "getUser();\ngetUser();\ngetUser();\n",
+        encoding="utf-8",
+    )
+    results = make_finder(tmp_path).find_references(
+        "getUser",
+        limit=2,
+    )
+
+    assert len(results) == 2
