@@ -88,17 +88,30 @@ class ReferenceFinder:
         limit = max(1, min(limit, 500))
         results: list[Reference] = []
 
-    for file_info in self.scanner.scan():
-            file_path = Path(file_info.absolute_path)
+        for file_info in self.scanner.scan():
+                file_path = Path(file_info.absolute_path)
 
-            try:
-                tree = self.parser.parse_file(
-                    file_path,
-                    file_info.language,
-                )
-                source_lines = file_path.read_text(
-                    encoding="utf-8",
-                    errors="replace",
-                ).splitlines()
-            except (OSError, UnicodeError, ValueError):
-                continue
+                try:
+                    tree = self.parser.parse_file(
+                        file_path,
+                        file_info.language,
+                    )
+                    source_lines = file_path.read_text(
+                        encoding="utf-8",
+                        errors="replace",
+                    ).splitlines()
+                except (OSError, UnicodeError, ValueError):
+                    continue
+
+                def walk(node):
+                    if len(results) >= limit:
+                        return
+
+                    if (
+                        node.type in self.IDENTIFIER_TYPES
+                        and node.text is not None
+                        and node.text.decode(
+                            "utf-8",
+                            errors="replace",
+                        ) == symbol_name
+                    ):
