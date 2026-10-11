@@ -22,3 +22,11 @@ def test_finds_function_definition_and_call(tmp_path):
         "const user = getUser();\n",
         encoding="utf-8",
     )
+    finder = make_finder(tmp_path)
+    results = finder.find_references("getUser")
+
+    assert len(results) == 2
+    assert {item["kind"] for item in results} == {
+        "definition",
+        "call",
+    }
