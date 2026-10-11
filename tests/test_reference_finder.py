@@ -12,3 +12,13 @@ def make_finder(root: Path) -> ReferenceFinder:
         scanner=RepositoryScanner(config),
         parser=CodeParser(),
     )
+
+def test_finds_function_definition_and_call(tmp_path):
+    (tmp_path / "service.ts").write_text(
+        "function getUser() { return null; }\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "controller.ts").write_text(
+        "const user = getUser();\n",
+        encoding="utf-8",
+    )
