@@ -31,3 +31,11 @@ class ReferenceFinder:
         "function_expression",
         "arrow_function",
     }
+
+    def __init__(
+    self,
+    scanner: RepositoryScanner,
+    parser: CodeParser,
+    ):
+        self.scanner = scanner
+        self.parser = parser
