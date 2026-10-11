@@ -61,3 +61,19 @@ class ReferenceFinder:
                 and node.end_byte <= function_node.end_byte
             ):
                 return "call"
+
+        if parent.type in {
+            "member_expression",
+            "optional_member_expression",
+        }:
+            property_node = parent.child_by_field_name("property")
+            if property_node is not None and property_node.id == node.id:
+                return "property_access"
+
+        if parent.type in {
+            "import_specifier",
+            "export_specifier",
+        }:
+            return "import_or_export"
+
+        return "identifier"
