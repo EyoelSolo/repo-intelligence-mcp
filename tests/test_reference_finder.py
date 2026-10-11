@@ -56,3 +56,6 @@ def test_returns_relative_path_and_line(tmp_path):
     assert len(results) == 1
     assert results[0]["file"] == "src/app.ts"
     assert results[0]["line"] == 2
+
+def test_empty_query_returns_no_results(tmp_path):
+    assert make_finder(tmp_path).find_references("  ") == []    
