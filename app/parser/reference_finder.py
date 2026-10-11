@@ -53,3 +53,11 @@ class ReferenceFinder:
             and name_node.id == node.id
         ):
             return "definition"
+        if parent.type == "call_expression":
+            function_node = parent.child_by_field_name("function")
+            if function_node is not None and (
+                function_node.id == node.id
+                or function_node.start_byte <= node.start_byte
+                and node.end_byte <= function_node.end_byte
+            ):
+                return "call"
