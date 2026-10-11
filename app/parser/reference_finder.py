@@ -85,3 +85,5 @@ class ReferenceFinder:
         symbol_name = symbol_name.strip()
         if not symbol_name:
             return []
+        limit = max(1, min(limit, 500))
+        results: list[Reference] = []
