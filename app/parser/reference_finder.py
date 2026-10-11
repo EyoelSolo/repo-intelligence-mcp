@@ -115,3 +115,9 @@ class ReferenceFinder:
                             errors="replace",
                         ) == symbol_name
                     ):
+                        line_index = node.start_point.row
+                    line_text = (
+                        source_lines[line_index].strip()
+                        if line_index < len(source_lines)
+                        else ""
+                    )
