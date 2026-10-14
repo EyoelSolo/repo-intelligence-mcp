@@ -53,3 +53,16 @@ class SymbolRelationships:
                 **candidate,
                 "resolution": "unresolved_candidate",
             })
+
+        return {
+            "symbol": symbol_name,
+            "definitions": definitions,
+            "references": references,
+            "total_definitions": len(definitions),
+            "total_references": len(references),
+            "resolution_note": (
+                "References are syntax-aware candidates. "
+                "They have not been semantically resolved to "
+                "specific definitions."
+            ),
+        }
