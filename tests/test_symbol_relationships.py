@@ -21,3 +21,15 @@ def test_combines_definitions_and_reference_candidates(
         "const user = getUser();\n",
         encoding="utf-8",
     )
+
+    scanner = RepositoryScanner(Config(tmp_path))
+    parser = CodeParser()
+
+    index = SymbolIndex(scanner, parser)
+    index.build()
+
+    finder = ReferenceFinder(scanner, parser)
+    relationships = SymbolRelationships(index, finder)
+
+    result = relationships.find("getUser")
+    
