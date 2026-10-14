@@ -280,6 +280,17 @@ def find_symbol(
 
     return results
 
+
+
+@mcp.tool()
+def lookup_symbol_definitions(symbol_name: str) -> list[dict]:
+    """Find indexed definitions matching a symbol name."""
+    if not symbol_name.strip():
+        return []
+
+    return symbol_index.find(symbol_name)
+
+
 @mcp.tool()
 def analyze_file(
     path: str,
