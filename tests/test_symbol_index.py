@@ -25,3 +25,21 @@ def test_indexes_function_and_class(tmp_path):
     assert results[0]["kind"] == "function"
     assert results[0]["file"] == "service.ts"
     assert results[0]["start_line"] == 2
+
+def test_finds_multiple_definitions_with_same_name(tmp_path):
+    (tmp_path / "a.ts").write_text(
+        "function getUser() { return 1; }\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "b.ts").write_text(
+        "function getUser() { return 2; }\n",
+        encoding="utf-8",
+    )
+
+    results = make_index(tmp_path).find("getUser")
+
+    assert len(results) == 2
+    assert {item["file"] for item in results} == {
+        "a.ts",
+        "b.ts",
+    }
