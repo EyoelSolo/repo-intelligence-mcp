@@ -43,3 +43,11 @@ def test_finds_multiple_definitions_with_same_name(tmp_path):
         "a.ts",
         "b.ts",
     }
+
+def test_lookup_is_case_insensitive(tmp_path):
+    (tmp_path / "service.ts").write_text(
+        "function getUser() { return null; }\n",
+        encoding="utf-8",
+    )
+
+    assert len(make_index(tmp_path).find("GETUSER")) == 1
