@@ -37,3 +37,19 @@ class SymbolRelationships:
             for item in definitions
         }
         references = []
+        for candidate in candidates:
+            location = (
+                candidate["file"].replace("\\", "/"),
+                candidate["line"],
+            )
+
+            if (
+                candidate["kind"] == "definition"
+                and location in definition_locations
+            ):
+                continue
+
+            references.append({
+                **candidate,
+                "resolution": "unresolved_candidate",
+            })
