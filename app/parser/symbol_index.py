@@ -53,3 +53,5 @@ class SymbolIndex:
                         end_line=symbol.end_line,
                     )
                 )
+            self.definitions = definitions
+            self.by_name = {}
