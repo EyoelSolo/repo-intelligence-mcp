@@ -1,6 +1,7 @@
 import logging
 
 from pathlib import Path
+from app.parser import reference_finder
 from app.repository.dependency_graph import DependencyGraph
 
 from mcp.server.mcpserver import MCPServer
@@ -13,6 +14,7 @@ from app.repository.security import safe_path, SecurityError
 from app.search.search_engine import SearchEngine
 from app.repository.detector import detect_language
 from app.parser.symbol_index import SymbolIndex
+from app.parser.symbol_relationships import SymbolRelationships
 
 
 
@@ -36,6 +38,7 @@ parser = CodeParser()
 symbol_index = SymbolIndex(scanner, parser)
 symbol_index.build()
 search_engine = SearchEngine(config)
+reference_finder = reference_finder(config)
 dependency_graph = DependencyGraph(
     scanner,
     parser,
@@ -47,6 +50,10 @@ mcp = MCPServer(
     "Repository Intelligence"
 )
 
+symbol_relationships = SymbolRelationships(
+    symbol_index=symbol_index,
+    reference_finder=reference_finder,
+)
 impact_analyzer = ImpactAnalyzer(
     dependency_graph
 )
