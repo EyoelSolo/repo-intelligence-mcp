@@ -69,3 +69,9 @@ class SymbolIndex:
 
             matches = self.by_name.get(name.strip().casefold(), [])
             return [asdict(item) for item in matches]
+
+        def all_definitions(self) -> list[dict]:
+            if not self.built:
+                self.build()
+
+            return [asdict(item) for item in self.definitions]
