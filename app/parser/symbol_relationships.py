@@ -24,3 +24,8 @@ class SymbolRelationships:
             }
 
         limit = max(1, min(limit, 500))
+        definitions = self.symbol_index.find(symbol_name)
+        candidates = self.reference_finder.find_references(
+            symbol_name=symbol_name,
+            limit=limit,
+        )
