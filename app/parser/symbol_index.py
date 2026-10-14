@@ -43,3 +43,13 @@ class SymbolIndex:
                 # One unsupported or malformed file should not
                 # prevent indexing the rest of the repository.
                 continue
+            for symbol in symbols:
+                definitions.append(
+                    SymbolDefinition(
+                        name=symbol.name,
+                        kind=symbol.kind,
+                        file=file_info.path.replace("\\", "/"),
+                        start_line=symbol.start_line,
+                        end_line=symbol.end_line,
+                    )
+                )
