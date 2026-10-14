@@ -14,6 +14,7 @@ class SymbolDefinition:
     start_line: int
     end_line: int
 
+
 class SymbolIndex:
     def __init__(
         self,
@@ -43,6 +44,7 @@ class SymbolIndex:
                 # One unsupported or malformed file should not
                 # prevent indexing the rest of the repository.
                 continue
+
             for symbol in symbols:
                 definitions.append(
                     SymbolDefinition(
@@ -53,25 +55,27 @@ class SymbolIndex:
                         end_line=symbol.end_line,
                     )
                 )
-            self.definitions = definitions
-            self.by_name = {}
 
-            for definition in definitions:
-                self.by_name.setdefault(
-                    definition.name.casefold(), []
-                ).append(definition)
+        # Build the index after scanning all files.
+        self.definitions = definitions
+        self.by_name = {}
 
-            self.built = True
+        for definition in definitions:
+            self.by_name.setdefault(
+                definition.name.casefold(), []
+            ).append(definition)
 
-        def find(self, name: str) -> list[dict]:
-            if not self.built:
-                self.build()
+        self.built = True
 
-            matches = self.by_name.get(name.strip().casefold(), [])
-            return [asdict(item) for item in matches]
+    def find(self, name: str) -> list[dict]:
+        if not self.built:
+            self.build()
 
-        def all_definitions(self) -> list[dict]:
-            if not self.built:
-                self.build()
+        matches = self.by_name.get(name.strip().casefold(), [])
+        return [asdict(item) for item in matches]
 
-            return [asdict(item) for item in self.definitions]
+    def all_definitions(self) -> list[dict]:
+        if not self.built:
+            self.build()
+
+        return [asdict(item) for item in self.definitions]
