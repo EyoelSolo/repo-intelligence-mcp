@@ -25,3 +25,21 @@ class SymbolIndex:
         self.definitions: list[SymbolDefinition] = []
         self.by_name: dict[str, list[SymbolDefinition]] = {}
         self.built = False
+
+    def build(self) -> None:
+        definitions: list[SymbolDefinition] = []
+
+        for file_info in self.scanner.scan():
+            file_path = Path(file_info.absolute_path)
+
+            try:
+                symbols = self.parser.extract_symbols(
+                    file_path,
+                    file_info.language,
+                )
+            except (OSError, ValueError, UnicodeError):
+                continue
+            except Exception:
+                # One unsupported or malformed file should not
+                # prevent indexing the rest of the repository.
+                continue
