@@ -62,3 +62,10 @@ class SymbolIndex:
                 ).append(definition)
 
             self.built = True
+
+        def find(self, name: str) -> list[dict]:
+            if not self.built:
+                self.build()
+
+            matches = self.by_name.get(name.strip().casefold(), [])
+            return [asdict(item) for item in matches]
