@@ -83,6 +83,7 @@ class ReferenceFinder:
             return "import_or_export"
 
         return "identifier"
+    
     def find_references(
         self,
         symbol_name: str,
@@ -91,37 +92,39 @@ class ReferenceFinder:
         symbol_name = symbol_name.strip()
         if not symbol_name:
             return []
+
         limit = max(1, min(limit, 500))
         results: list[Reference] = []
 
         for file_info in self.scanner.scan():
-                file_path = Path(file_info.absolute_path)
+            file_path = Path(file_info.absolute_path)
 
-                try:
-                    tree = self.parser.parse_file(
-                        file_path,
-                        file_info.language,
-                    )
-                    source_lines = file_path.read_text(
-                        encoding="utf-8",
+            try:
+                tree = self.parser.parse_file(
+                    file_path,
+                    file_info.language,
+                )
+                source_lines = file_path.read_text(
+                    encoding="utf-8",
+                    errors="replace",
+                ).splitlines()
+            except (OSError, UnicodeError, ValueError):
+                continue
+
+            def walk(node):
+                if len(results) >= limit:
+                    return
+
+                if (
+                    node.type in self.IDENTIFIER_TYPES
+                    and node.text is not None
+                    and node.text.decode(
+                        "utf-8",
                         errors="replace",
-                    ).splitlines()
-                except (OSError, UnicodeError, ValueError):
-                    continue
+                    ) == symbol_name
+                ):
+                    line_index = node.start_point.row
 
-                def walk(node):
-                    if len(results) >= limit:
-                        return
-
-                    if (
-                        node.type in self.IDENTIFIER_TYPES
-                        and node.text is not None
-                        and node.text.decode(
-                            "utf-8",
-                            errors="replace",
-                        ) == symbol_name
-                    ):
-                        line_index = node.start_point.row
                     line_text = (
                         source_lines[line_index].strip()
                         if line_index < len(source_lines)
@@ -131,20 +134,22 @@ class ReferenceFinder:
                     results.append(
                         Reference(
                             name=symbol_name,
-                            file=file_info.path,
+                            file=Path(file_info.path).as_posix(),
                             line=line_index + 1,
                             kind=self.classify(node),
                             text=line_text,
                         )
                     )
+
                     return
+
                 for child in node.children:
                     walk(child)
 
-                walk(tree.root_node)
+            walk(tree.root_node)
 
-                if len(results) >= limit:
-                    break
+            if len(results) >= limit:
+                break
 
         return [
             asdict(reference)
