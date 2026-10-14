@@ -12,6 +12,7 @@ from app.repository.scanner import RepositoryScanner
 from app.repository.security import safe_path, SecurityError
 from app.search.search_engine import SearchEngine
 from app.repository.detector import detect_language
+from app.parser.symbol_index import SymbolIndex
 
 
 
@@ -32,12 +33,15 @@ config = Config(REPOSITORY_PATH)
 
 scanner = RepositoryScanner(config)
 parser = CodeParser()
+symbol_index = SymbolIndex(scanner, parser)
+symbol_index.build()
 search_engine = SearchEngine(config)
 dependency_graph = DependencyGraph(
     scanner,
     parser,
 )
 dependency_graph.build()
+
 #mcp server
 mcp = MCPServer(
     "Repository Intelligence"
