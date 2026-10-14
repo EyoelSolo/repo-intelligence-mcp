@@ -164,6 +164,28 @@ def search_code(
 
 
 @mcp.tool()
+def find_symbol_relationships(
+    symbol_name: str,
+    limit: int = 100,
+) -> dict:
+    """Return a symbol's definitions and reference candidates."""
+    if not symbol_name.strip():
+        return {
+            "symbol": symbol_name,
+            "definitions": [],
+            "references": [],
+            "total_definitions": 0,
+            "total_references": 0,
+        }
+
+    limit = max(1, min(limit, 500))
+
+    return symbol_relationships.find(
+        symbol_name=symbol_name,
+        limit=limit,
+    )
+
+@mcp.tool()
 def get_file(
     path: str,
     start_line: int = 1,
