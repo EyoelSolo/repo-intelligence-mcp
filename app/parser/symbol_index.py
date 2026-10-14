@@ -55,3 +55,10 @@ class SymbolIndex:
                 )
             self.definitions = definitions
             self.by_name = {}
+
+            for definition in definitions:
+                self.by_name.setdefault(
+                    definition.name.casefold(), []
+                ).append(definition)
+
+            self.built = True
