@@ -32,4 +32,13 @@ def test_combines_definitions_and_reference_candidates(
     relationships = SymbolRelationships(index, finder)
 
     result = relationships.find("getUser")
-    
+    assert result["total_definitions"] == 1
+    assert result["definitions"][0]["file"] == "service.ts"
+
+    assert result["total_references"] == 1
+    assert result["references"][0]["file"] == "controller.ts"
+    assert result["references"][0]["kind"] == "call"
+    assert (
+        result["references"][0]["resolution"]
+        == "unresolved_candidate"
+    )
