@@ -36,3 +36,4 @@ class SymbolRelationships:
             )
             for item in definitions
         }
+        references = []
