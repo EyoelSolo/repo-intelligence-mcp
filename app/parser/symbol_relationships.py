@@ -29,3 +29,10 @@ class SymbolRelationships:
             symbol_name=symbol_name,
             limit=limit,
         )
+        definition_locations = {
+            (
+                item["file"].replace("\\", "/"),
+                item["start_line"],
+            )
+            for item in definitions
+        }
