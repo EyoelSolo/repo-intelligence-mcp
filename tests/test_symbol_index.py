@@ -51,3 +51,11 @@ def test_lookup_is_case_insensitive(tmp_path):
     )
 
     assert len(make_index(tmp_path).find("GETUSER")) == 1
+
+def test_missing_symbol_returns_empty_list(tmp_path):
+    (tmp_path / "service.ts").write_text(
+        "function getUser() { return null; }\n",
+        encoding="utf-8",
+    )
+
+    assert make_index(tmp_path).find("missingSymbol") == []
