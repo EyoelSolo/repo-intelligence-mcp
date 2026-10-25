@@ -15,6 +15,7 @@ from app.search.search_engine import SearchEngine
 from app.repository.detector import detect_language
 from app.parser.symbol_index import SymbolIndex
 from app.parser.symbol_relationships import SymbolRelationships
+from app.ai.openai_compatible import AIProviderError, OpenAICompatibleClient
 
 
 
@@ -486,6 +487,50 @@ def analyze_change_impact(
         path,
         max_depth,
     )
+
+
+@mcp.tool()
+def ask_ai(prompt: str, file_paths: list[str] | None = None) -> dict:
+    """Ask a configured AI provider, optionally attaching selected local text files.
+
+    File contents are sent to AI_BASE_URL. Pass only files you want to share.
+    """
+    if not prompt.strip():
+        return {"error": "Prompt must not be empty."}
+    selected_paths = file_paths or []
+    if len(selected_paths) > 10:
+        return {"error": "Select at most 10 context files per request."}
+
+    context_parts = []
+    total_chars = 0
+    for relative_path in selected_paths:
+        try:
+            file_path = safe_path(config.repository_root, relative_path)
+        except SecurityError as exc:
+            return {"error": str(exc)}
+        if not file_path.is_file():
+            return {"error": f"Not a file: {relative_path}"}
+        try:
+            if file_path.stat().st_size > config.max_file_size:
+                return {"error": f"File exceeds the context limit: {relative_path}"}
+            content = file_path.read_text(encoding="utf-8", errors="strict")
+        except (OSError, UnicodeError):
+            return {"error": f"Could not read UTF-8 text file: {relative_path}"}
+        if "\x00" in content:
+            return {"error": f"Binary files cannot be attached: {relative_path}"}
+        total_chars += len(content)
+        if total_chars > 60_000:
+            return {"error": "Combined context is limited to 60,000 characters."}
+        context_parts.append(f"--- {relative_path} ---\n{content}")
+
+    try:
+        answer = OpenAICompatibleClient().complete(
+            prompt,
+            "\n\n".join(context_parts),
+        )
+    except AIProviderError as exc:
+        return {"error": str(exc)}
+    return {"answer": answer, "context_files": selected_paths}
 
 if __name__ == "__main__":
     main()
