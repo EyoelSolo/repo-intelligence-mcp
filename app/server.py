@@ -250,6 +250,20 @@ def get_file(
     return "\n".join(output)
 
 
+@mcp.tool()
+def list_files(query: str = "", limit: int = 200) -> list[dict]:
+    """List supported source and text files in the configured repository."""
+    limit = max(1, min(limit, 1000))
+    query_lower = query.strip().casefold()
+    files = scanner.scan()
+    matches = [
+        {"path": item.path, "language": item.language, "size": item.size, "lines": item.lines}
+        for item in files
+        if query_lower in item.path.casefold()
+    ]
+    return matches[:limit]
+
+
 # ---------------------------------------------------------
 # Tool: find symbol
 # ---------------------------------------------------------
