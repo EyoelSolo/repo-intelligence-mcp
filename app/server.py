@@ -189,7 +189,7 @@ def get_file(
     """
     Read a source file from the repository.
 
-    Only JavaScript/TypeScript files are currently supported.
+    Read a UTF-8 text or source file within the configured repository.
     """
 
     try:
@@ -209,23 +209,20 @@ def get_file(
 
 
 
-    detected = detect_language(file_path)
-
-    if detected is None:
-        return (
-            "Unsupported file type. "
-            "Only JavaScript and TypeScript "
-            "files are currently supported."
-        )
+    if file_path.stat().st_size > config.max_file_size:
+        return f"File exceeds the {config.max_file_size}-byte read limit."
 
     try:
         lines = file_path.read_text(
             encoding="utf-8",
-            errors="replace",
+            errors="strict",
         ).splitlines()
 
-    except OSError as exc:
-        return f"Could not read file: {exc}"
+    except (OSError, UnicodeError) as exc:
+        return f"Could not read file as UTF-8 text: {exc}"
+
+    if any("\x00" in line for line in lines):
+        return "Unsupported binary file. Only UTF-8 text files can be read."
 
     start_line = max(1, start_line)
     end_line = min(
