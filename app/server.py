@@ -354,9 +354,9 @@ def analyze_file(
 
     language = detect_language(file_path)
 
-    if language is None:
+    if language not in {"javascript", "typescript", "tsx"}:
         return {
-            "error": "Unsupported file type."
+            "error": "This parser currently analyzes JavaScript and TypeScript files only."
         }
 
     try:
