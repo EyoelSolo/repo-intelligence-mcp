@@ -26,12 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 #configuration
-REPOSITORY_PATH = Path(
-   
-    "./demo-repository"
-)
-
-config = Config(REPOSITORY_PATH)
+config = Config.from_environment()
 
 scanner = RepositoryScanner(config)
 parser = CodeParser()

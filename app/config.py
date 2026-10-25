@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import os
 from pathlib import Path
 
 
@@ -44,3 +45,12 @@ class Config:
             raise ValueError(
                 f"repository path is not a directory: {self.repository_root}"
             )
+
+
+    @classmethod
+    def from_environment(cls) -> "Config":
+        """Load the repository root from REPO_INTELLIGENCE_ROOT, if set."""
+        configured_root = os.environ.get("REPO_INTELLIGENCE_ROOT")
+        if configured_root:
+            return cls(Path(configured_root))
+        return cls(Path(__file__).resolve().parent.parent / "demo-repository")
