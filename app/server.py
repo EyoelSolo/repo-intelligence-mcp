@@ -135,7 +135,7 @@ def search_code(
     limit: int = 20,
 ) -> list[dict]:
     """
-    Search JavaScript/TypeScript source code.
+    Search indexed source and text files.
 
     Args:
         query: Text to search for.
