@@ -115,7 +115,7 @@ def get_dependents(
 @mcp.tool()
 def get_project_structure() -> str:
     """
-    Return the JavaScript/TypeScript project structure.
+    Return the indexed source and text file paths.
     """
 
     files = scanner.scan()
@@ -126,7 +126,7 @@ def get_project_structure() -> str:
     )
 
     if not paths:
-        return "No JavaScript/TypeScript files found."
+        return "No supported source or text files found."
 
     return "\n".join(paths)
 @mcp.tool()
