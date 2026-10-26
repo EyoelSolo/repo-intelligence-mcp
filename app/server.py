@@ -1,7 +1,7 @@
 import logging
 
 from pathlib import Path
-from app.parser import reference_finder
+from app.parser.reference_finder import ReferenceFinder
 from app.repository.dependency_graph import DependencyGraph
 
 from mcp.server.mcpserver import MCPServer
@@ -34,7 +34,7 @@ parser = CodeParser()
 symbol_index = SymbolIndex(scanner, parser)
 symbol_index.build()
 search_engine = SearchEngine(config)
-reference_finder = reference_finder(config)
+reference_finder = ReferenceFinder(scanner, parser)
 dependency_graph = DependencyGraph(
     scanner,
     parser,
