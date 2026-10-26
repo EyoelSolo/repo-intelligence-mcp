@@ -59,6 +59,8 @@ class RepositoryScanner:
 
                 try:
                     content = path.read_text(encoding="utf-8", errors="replace")
+                    if "\x00" in content:
+                        continue
                     relative_path = path.relative_to(self.config.repository_root)
                     results.append(FileInfo(
                         path=str(relative_path),
