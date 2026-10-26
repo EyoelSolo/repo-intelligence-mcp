@@ -91,6 +91,8 @@ class DependencyGraph:
             "index.tsx",
             "index.js",
             "index.jsx",
+            "index.mjs",
+            "index.cjs",
         ):
 
             possible_file = candidate / index_name
