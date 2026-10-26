@@ -25,11 +25,15 @@ class RepositoryScanner:
         return path.name in self.config.ignored_directories
 
     def should_ignore_file(self, path: Path) -> bool:
-        return (
-            path.name in self.config.ignored_files
-            or is_sensitive_path(path)
-            or path.stat().st_size > self.config.max_file_size
-        )
+        if path.name in self.config.ignored_files or is_sensitive_path(path):
+            return True
+
+        try:
+            return path.stat().st_size > self.config.max_file_size
+        except OSError:
+            # Files can disappear or become inaccessible during a scan. Skip
+            # them instead of aborting discovery for the entire repository.
+            return True
 
     def scan(self) -> list[FileInfo]:
         results: list[FileInfo] = []
