@@ -3,6 +3,8 @@ from pathlib import Path
 from app.config import Config
 from app.repository.scanner import RepositoryScanner
 
+MAX_RESULT_CONTENT_CHARS = 1000
+
 
 class SearchResult:
     def __init__(
@@ -60,11 +62,14 @@ class SearchEngine:
             ):
 
                 if query_lower in line.lower():
+                    content = line.strip()
+                    if len(content) > MAX_RESULT_CONTENT_CHARS:
+                        content = content[:MAX_RESULT_CONTENT_CHARS - 3] + "..."
 
                     result = SearchResult(
                         file=file_info.path,
                         line=line_number,
-                        content=line.strip(),
+                        content=content,
                     )
 
                     results.append(result.to_dict())
@@ -72,4 +77,4 @@ class SearchEngine:
                     if len(results) >= limit:
                         return results
 
-        return results    
+        return results
