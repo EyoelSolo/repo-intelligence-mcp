@@ -281,43 +281,10 @@ def find_symbol(
     types, and enums in the repository.
     """
 
-    results = []
+    if not symbol_name.strip():
+        return []
 
-    files = scanner.scan()
-
-    for file in files:
-
-        path = Path(file.absolute_path)
-
-        try:
-            symbols = parser.extract_symbols(
-                path,
-                file.language,
-            )
-
-        except Exception as exc:
-            logger.warning(
-                "Could not parse %s: %s",
-                file.path,
-                exc,
-            )
-            continue
-
-        for symbol in symbols:
-
-            if symbol.name.lower() == symbol_name.lower():
-
-                results.append(
-                    {
-                        "name": symbol.name,
-                        "kind": symbol.kind,
-                        "file": file.path,
-                        "start_line": symbol.start_line,
-                        "end_line": symbol.end_line,
-                    }
-                )
-
-    return results
+    return symbol_index.find(symbol_name)
 
 
 
