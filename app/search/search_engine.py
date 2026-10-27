@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 from app.config import Config
 from app.repository.scanner import RepositoryScanner
@@ -36,12 +37,16 @@ class SearchEngine:
         query: str,
         limit: int = 20,
         case_sensitive: bool = False,
+        whole_word: bool = False,
     ) -> list[dict]:
 
         if limit <= 0 or not query:
             return []
 
         needle = query if case_sensitive else query.casefold()
+        matcher = re.compile(
+            rf"(?<!\w){re.escape(needle)}(?!\w)"
+        ) if whole_word else None
 
         results = []
 
@@ -66,7 +71,12 @@ class SearchEngine:
             ):
 
                 haystack = line if case_sensitive else line.casefold()
-                if needle in haystack:
+                matched = (
+                    matcher.search(haystack) is not None
+                    if matcher
+                    else needle in haystack
+                )
+                if matched:
                     content = line.strip()
                     if len(content) > MAX_RESULT_CONTENT_CHARS:
                         content = content[:MAX_RESULT_CONTENT_CHARS - 3] + "..."

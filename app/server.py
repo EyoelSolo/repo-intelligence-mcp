@@ -135,6 +135,7 @@ def search_code(
     query: str,
     limit: int = 20,
     case_sensitive: bool = False,
+    whole_word: bool = False,
 ) -> list[dict]:
     """
     Search indexed source and text files.
@@ -143,6 +144,7 @@ def search_code(
         query: Text to search for.
         limit: Maximum number of results.
         case_sensitive: Whether letter case must match.
+        whole_word: Whether to match only complete words.
     """
 
     if not query.strip():
@@ -157,6 +159,7 @@ def search_code(
         query=query,
         limit=limit,
         case_sensitive=case_sensitive,
+        whole_word=whole_word,
     )
 
 
