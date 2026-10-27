@@ -89,6 +89,8 @@ class DependencyGraph:
         for index_name in (
             "index.ts",
             "index.tsx",
+            "index.mts",
+            "index.cts",
             "index.js",
             "index.jsx",
             "index.mjs",
