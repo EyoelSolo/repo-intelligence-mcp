@@ -324,6 +324,21 @@ def analyze_file(
             "error": f"File not found: {path}"
         }
 
+    if not file_path.is_file():
+        return {
+            "error": f"Not a file: {path}"
+        }
+
+    try:
+        if file_path.stat().st_size > config.max_file_size:
+            return {
+                "error": f"File exceeds the {config.max_file_size}-byte analysis limit."
+            }
+    except OSError as exc:
+        return {
+            "error": f"Could not access file: {exc}"
+        }
+
     from app.repository.detector import detect_language
 
     language = detect_language(file_path)
