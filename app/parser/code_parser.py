@@ -118,6 +118,20 @@ class CodeParser:
                         errors="replace",
                     )
 
+            elif node_type == "variable_declarator":
+                value_node = node.child_by_field_name("value")
+                if value_node is not None and value_node.type in {
+                    "arrow_function",
+                    "function_expression",
+                }:
+                    name_node = node.child_by_field_name("name")
+                    if name_node is not None and name_node.type == "identifier":
+                        symbol_kind = "function"
+                        symbol_name = name_node.text.decode(
+                            "utf-8",
+                            errors="replace",
+                        )
+
             elif node_type == "method_definition":
                 symbol_kind = "method"
 
