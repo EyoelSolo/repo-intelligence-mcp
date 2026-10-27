@@ -35,9 +35,13 @@ class SearchEngine:
         self,
         query: str,
         limit: int = 20,
+        case_sensitive: bool = False,
     ) -> list[dict]:
 
-        query_lower = query.lower()
+        if limit <= 0 or not query:
+            return []
+
+        needle = query if case_sensitive else query.casefold()
 
         results = []
 
@@ -61,7 +65,8 @@ class SearchEngine:
                 start=1,
             ):
 
-                if query_lower in line.lower():
+                haystack = line if case_sensitive else line.casefold()
+                if needle in haystack:
                     content = line.strip()
                     if len(content) > MAX_RESULT_CONTENT_CHARS:
                         content = content[:MAX_RESULT_CONTENT_CHARS - 3] + "..."

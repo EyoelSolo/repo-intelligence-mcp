@@ -134,6 +134,7 @@ def get_project_structure() -> str:
 def search_code(
     query: str,
     limit: int = 20,
+    case_sensitive: bool = False,
 ) -> list[dict]:
     """
     Search indexed source and text files.
@@ -141,6 +142,7 @@ def search_code(
     Args:
         query: Text to search for.
         limit: Maximum number of results.
+        case_sensitive: Whether letter case must match.
     """
 
     if not query.strip():
@@ -154,6 +156,7 @@ def search_code(
     return search_engine.search(
         query=query,
         limit=limit,
+        case_sensitive=case_sensitive,
     )
 
 
