@@ -32,4 +32,4 @@ You may point `AI_BASE_URL` at another provider that implements `/chat/completio
 
 ## Current analysis limits
 
-Repository-wide symbol definitions, reference candidates, and dependency graphs are built when the server starts. Restart the server after changing files to refresh these indexes. Semantic reference resolution is not implemented; reference results are syntax-based candidates. Tree-sitter analysis and local import resolution currently cover JavaScript and TypeScript, while broader-language support is limited to file discovery, reading, and text search.
+Repository-wide symbol definitions, reference candidates, and dependency graphs are built when the server starts. Call `refresh_repository_index` after changing files to rebuild the symbol and dependency indexes without restarting the server. Semantic reference resolution is not implemented; reference results are syntax-based candidates. Tree-sitter analysis and local import resolution currently cover JavaScript and TypeScript, while broader-language support is limited to file discovery, reading, and text search.

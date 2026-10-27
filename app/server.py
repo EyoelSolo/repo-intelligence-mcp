@@ -426,6 +426,17 @@ def get_dependency_graph() -> dict:
         ],
     }
 
+
+@mcp.tool()
+def refresh_repository_index() -> dict:
+    """Rebuild symbol and dependency indexes from the current repository contents."""
+    symbol_index.build()
+    dependency_graph.build()
+    return {
+        "indexed_files": len(dependency_graph.file_index),
+        "indexed_symbols": len(symbol_index.definitions),
+    }
+
 @mcp.resource(
     "repo://structure"
 )
