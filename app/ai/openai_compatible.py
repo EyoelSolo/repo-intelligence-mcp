@@ -5,6 +5,8 @@ import os
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+MAX_RESPONSE_BYTES = 1_000_000
+
 
 class AIProviderError(RuntimeError):
     """A safe-to-display provider configuration or request error."""
@@ -58,7 +60,10 @@ class OpenAICompatibleClient:
         )
         try:
             with urlopen(request, timeout=self.timeout) as response:
-                result = json.loads(response.read().decode("utf-8"))
+                response_body = response.read(MAX_RESPONSE_BYTES + 1)
+                if len(response_body) > MAX_RESPONSE_BYTES:
+                    raise AIProviderError("AI provider response exceeded the 1 MB limit.")
+                result = json.loads(response_body.decode("utf-8"))
         except HTTPError as exc:
             raise AIProviderError(f"AI provider returned HTTP {exc.code}.") from None
         except (URLError, TimeoutError, OSError) as exc:
