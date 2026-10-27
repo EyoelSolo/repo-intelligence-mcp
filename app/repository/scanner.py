@@ -72,4 +72,4 @@ class RepositoryScanner:
                 except (OSError, UnicodeError):
                     continue
 
-        return results
+        return sorted(results, key=lambda item: item.path.replace("\\", "/").casefold())
