@@ -6,7 +6,8 @@ class SecurityError(Exception):
 SENSITIVE_NAMES = {
     ".env", ".env.local", ".env.production", ".env.development",
     ".env.test", "id_rsa", "id_ed25519", "credentials.json",
-    "secrets.json", "token.json",
+    "id_dsa", "id_ecdsa", "id_ed25519_sk", "id_ecdsa_sk",
+    ".netrc", ".npmrc", ".pypirc", "secrets.json", "token.json",
 }
 SENSITIVE_SUFFIXES = {".pem", ".key", ".p12", ".pfx", ".keystore"}
 SENSITIVE_DIRECTORIES = {".ssh", ".aws", ".secrets"}
