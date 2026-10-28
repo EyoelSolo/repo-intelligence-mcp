@@ -16,6 +16,7 @@ from app.repository.detector import detect_language
 from app.parser.symbol_index import SymbolIndex
 from app.parser.symbol_relationships import SymbolRelationships
 from app.ai.openai_compatible import AIProviderError, OpenAICompatibleClient
+from app.data.http_source import DataSourceError, HttpJsonSource
 
 
 
@@ -532,6 +533,22 @@ def ask_ai(prompt: str, file_paths: list[str] | None = None) -> dict:
     except AIProviderError as exc:
         return {"error": str(exc)}
     return {"answer": answer, "context_files": selected_paths}
+
+
+@mcp.tool()
+def fetch_external_records(limit: int = 100) -> dict:
+    """Fetch bounded JSON records from the configured online data source.
+
+    Set REPO_INTELLIGENCE_DATA_URL to an HTTP(S) JSON endpoint. Returned records
+    use a common envelope and retain original source attributes and provenance.
+    """
+    if not config.data_source_url:
+        return {"error": "Set REPO_INTELLIGENCE_DATA_URL to configure a data source."}
+    try:
+        records = HttpJsonSource(config.data_source_url).fetch(limit=limit)
+    except DataSourceError as exc:
+        return {"error": str(exc)}
+    return {"count": len(records), "records": [record.to_dict() for record in records]}
 
 if __name__ == "__main__":
     main()

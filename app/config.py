@@ -6,6 +6,7 @@ from pathlib import Path
 @dataclass
 class Config: 
     repository_root: Path
+    data_source_url: str | None = None
 
 
     ignored_directories: tuple [str, ...] = (
@@ -52,5 +53,11 @@ class Config:
         """Load the repository root from REPO_INTELLIGENCE_ROOT, if set."""
         configured_root = os.environ.get("REPO_INTELLIGENCE_ROOT")
         if configured_root:
-            return cls(Path(configured_root))
-        return cls(Path(__file__).resolve().parent.parent / "demo-repository")
+            return cls(
+                Path(configured_root),
+                data_source_url=os.environ.get("REPO_INTELLIGENCE_DATA_URL"),
+            )
+        return cls(
+            Path(__file__).resolve().parent.parent / "demo-repository",
+            data_source_url=os.environ.get("REPO_INTELLIGENCE_DATA_URL"),
+        )
