@@ -22,10 +22,12 @@ class RepositoryScanner:
         self.config = config
 
     def should_ignore_directory(self, path: Path) -> bool:
-        return path.name in self.config.ignored_directories
+        ignored = {name.casefold() for name in self.config.ignored_directories}
+        return path.name.casefold() in ignored
 
     def should_ignore_file(self, path: Path) -> bool:
-        if path.name in self.config.ignored_files or is_sensitive_path(path):
+        ignored = {name.casefold() for name in self.config.ignored_files}
+        if path.name.casefold() in ignored or is_sensitive_path(path):
             return True
 
         try:
@@ -44,7 +46,7 @@ class RepositoryScanner:
         ):
             child_directories[:] = [
                 name for name in child_directories
-                if name not in self.config.ignored_directories
+                if not self.should_ignore_directory(Path(directory) / name)
                 and not (Path(directory) / name).is_symlink()
             ]
             current_directory = Path(directory)
