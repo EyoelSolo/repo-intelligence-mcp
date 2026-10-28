@@ -33,3 +33,31 @@ You may point `AI_BASE_URL` at another provider that implements `/chat/completio
 ## Current analysis limits
 
 Repository-wide symbol definitions, reference candidates, and dependency graphs are built when the server starts. Call `refresh_repository_index` after changing files to rebuild the symbol and dependency indexes without restarting the server. Semantic reference resolution is not implemented; reference results are syntax-based candidates. Tree-sitter analysis and local import resolution currently cover JavaScript and TypeScript, while broader-language support is limited to file discovery, reading, and text search.
+
+## External data and local retrieval adapters
+
+Set `REPO_INTELLIGENCE_DATA_URL` to an HTTP(S) JSON endpoint to enable the
+`fetch_external_records` tool. It accepts JSON arrays, common `results`/`data`
+wrappers, single JSON objects, and GeoJSON Features or FeatureCollections. Each
+record is returned in a stable envelope with `id`, `source`, `retrieved_at`,
+`attributes`, optional `geometry`, and `source_url`; original source fields are
+preserved under `attributes`. Responses are limited to 2 MB and 1,000 records.
+
+To connect a local vector/RAG corpus, set `REPO_INTELLIGENCE_RETRIEVER` to a
+Python factory in `module:factory` form. The factory returns an object with
+`search(query, limit=...)`, which returns passages containing `text` and
+`source`, with optional `score` and `metadata`. The MCP exposes this through
+`search_local_knowledge`; the vector store and corpus remain local and are
+implemented by the configured adapter, not by an external MCP server.
+
+Example configuration:
+
+```powershell
+$env:REPO_INTELLIGENCE_DATA_URL = 'https://data.example/api/records'
+$env:REPO_INTELLIGENCE_RETRIEVER = 'my_rag_adapter:create_retriever'
+uv run repo-intelligence-mcp
+```
+
+The online connector currently fetches one configured JSON endpoint per call;
+source-specific authentication, pagination, and refresh policies belong in a
+connector adapter when the chosen source requires them.
