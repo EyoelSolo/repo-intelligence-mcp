@@ -17,6 +17,7 @@ from app.parser.symbol_index import SymbolIndex
 from app.parser.symbol_relationships import SymbolRelationships
 from app.ai.openai_compatible import AIProviderError, OpenAICompatibleClient
 from app.data.http_source import DataSourceError, HttpJsonSource
+from app.knowledge.retriever import load_local_retriever
 
 
 
@@ -549,6 +550,33 @@ def fetch_external_records(limit: int = 100) -> dict:
     except DataSourceError as exc:
         return {"error": str(exc)}
     return {"count": len(records), "records": [record.to_dict() for record in records]}
+
+
+@mcp.tool()
+def search_local_knowledge(query: str, limit: int = 5) -> dict:
+    """Search a configured local RAG adapter and return cited passages.
+
+    Configure REPO_INTELLIGENCE_RETRIEVER as ``python.module:factory``. The
+    factory must return an object implementing search(query, limit=...).
+    """
+    if not query.strip():
+        return {"error": "Query must not be empty."}
+    try:
+        retriever = load_local_retriever()
+        if retriever is None:
+            return {"error": "No local retriever configured; set REPO_INTELLIGENCE_RETRIEVER."}
+        passages = retriever.search(query.strip(), limit=max(1, min(limit, 20)))
+    except (ImportError, AttributeError, TypeError, ValueError) as exc:
+        logger.exception("Local retriever configuration or query failed")
+        return {"error": f"Could not query the local retriever: {exc}"}
+    return {
+        "query": query.strip(),
+        "count": len(passages),
+        "passages": [
+            item.to_dict() if hasattr(item, "to_dict") else item
+            for item in passages
+        ],
+    }
 
 if __name__ == "__main__":
     main()
