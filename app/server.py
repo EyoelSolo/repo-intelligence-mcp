@@ -496,6 +496,8 @@ def ask_ai(prompt: str, file_paths: list[str] | None = None) -> dict:
     """
     if not prompt.strip():
         return {"error": "Prompt must not be empty."}
+    if len(prompt) > 20_000:
+        return {"error": "Prompt is limited to 20,000 characters."}
     selected_paths = file_paths or []
     if len(selected_paths) > 10:
         return {"error": "Select at most 10 context files per request."}
