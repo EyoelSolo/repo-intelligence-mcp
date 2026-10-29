@@ -2,6 +2,7 @@
 
 from dataclasses import asdict, dataclass
 from importlib import import_module
+import math
 import os
 from typing import Any, Protocol
 
@@ -24,6 +25,33 @@ class LocalRetriever(Protocol):
 
     def search(self, query: str, *, limit: int = 5) -> list[RetrievedPassage]:
         """Return ranked excerpts with source references for a natural query."""
+
+
+MAX_PASSAGE_CHARS = 8_000
+
+
+def normalize_passage(value: Any) -> RetrievedPassage:
+    """Validate and bound an adapter result before exposing it to MCP clients."""
+    if isinstance(value, RetrievedPassage):
+        passage = value
+    elif isinstance(value, dict):
+        passage = RetrievedPassage(**value)
+    else:
+        raise ValueError("Retriever results must be passages or passage dictionaries.")
+    if not isinstance(passage.text, str) or not passage.text.strip():
+        raise ValueError("Retriever passage text must be a non-empty string.")
+    if not isinstance(passage.source, str) or not passage.source.strip():
+        raise ValueError("Retriever passage source must be a non-empty string.")
+    if passage.score is not None and (
+        isinstance(passage.score, bool)
+        or not isinstance(passage.score, (int, float))
+        or not math.isfinite(passage.score)
+    ):
+        raise ValueError("Retriever passage score must be a finite number.")
+    if passage.metadata is not None and not isinstance(passage.metadata, dict):
+        raise ValueError("Retriever passage metadata must be an object.")
+    passage.text = passage.text[:MAX_PASSAGE_CHARS]
+    return passage
 
 
 def load_local_retriever() -> LocalRetriever | None:

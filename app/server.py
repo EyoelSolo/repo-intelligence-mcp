@@ -17,7 +17,7 @@ from app.parser.symbol_index import SymbolIndex
 from app.parser.symbol_relationships import SymbolRelationships
 from app.ai.openai_compatible import AIProviderError, OpenAICompatibleClient
 from app.data.http_source import DataSourceError, HttpJsonSource
-from app.knowledge.retriever import load_local_retriever
+from app.knowledge.retriever import load_local_retriever, normalize_passage
 
 
 
@@ -566,6 +566,7 @@ def search_local_knowledge(query: str, limit: int = 5) -> dict:
         if retriever is None:
             return {"error": "No local retriever configured; set REPO_INTELLIGENCE_RETRIEVER."}
         passages = retriever.search(query.strip(), limit=max(1, min(limit, 20)))
+        passages = [normalize_passage(item) for item in passages]
     except (ImportError, AttributeError, TypeError, ValueError) as exc:
         logger.exception("Local retriever configuration or query failed")
         return {"error": f"Could not query the local retriever: {exc}"}
