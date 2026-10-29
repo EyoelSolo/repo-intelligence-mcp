@@ -1,6 +1,7 @@
 """Bounded HTTP JSON connector for configured data sources."""
 
 import json
+import os
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -16,17 +17,36 @@ class DataSourceError(RuntimeError):
 
 
 class HttpJsonSource:
-    def __init__(self, url: str, *, name: str = "configured-source", timeout: float = 15):
+    def __init__(self, url: str, *, name: str = "configured-source", timeout: float = 15, headers: dict[str, str] | None = None):
         self.url = url.strip()
         self.name = name
         self.timeout = min(60.0, max(1.0, timeout))
+        self.headers = {"Accept": "application/json", **(headers or {})}
+
+    @classmethod
+    def from_environment(cls, url: str) -> "HttpJsonSource":
+        """Build a connector using optional JSON request headers from the environment."""
+        raw_headers = os.environ.get("REPO_INTELLIGENCE_DATA_HEADERS", "").strip()
+        headers: dict[str, str] = {}
+        if raw_headers:
+            try:
+                value = json.loads(raw_headers)
+            except json.JSONDecodeError:
+                raise DataSourceError("REPO_INTELLIGENCE_DATA_HEADERS must be a JSON object.") from None
+            if not isinstance(value, dict) or any(
+                not isinstance(key, str) or not isinstance(item, str)
+                for key, item in value.items()
+            ):
+                raise DataSourceError("Data source headers must be string key-value pairs.")
+            headers = value
+        return cls(url, headers=headers)
 
     def fetch(self, *, limit: int = 100) -> list[DataRecord]:
         parsed = urlparse(self.url)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
             raise DataSourceError("Data source URL must be an absolute HTTP or HTTPS URL.")
         limit = min(MAX_RECORDS, max(1, limit))
-        request = Request(self.url, headers={"Accept": "application/json"})
+        request = Request(self.url, headers=self.headers)
         try:
             with urlopen(request, timeout=self.timeout) as response:
                 body = response.read(MAX_RESPONSE_BYTES + 1)
