@@ -62,6 +62,8 @@ def normalize_payload(
         values = payload["results"]
     elif isinstance(payload, dict) and isinstance(payload.get("data"), list):
         values = payload["data"]
+    elif isinstance(payload, dict) and isinstance(payload.get("items"), list):
+        values = payload["items"]
     else:
         values = [payload]
 
