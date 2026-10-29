@@ -42,13 +42,24 @@ wrappers, single JSON objects, and GeoJSON Features or FeatureCollections. Each
 record is returned in a stable envelope with `id`, `source`, `retrieved_at`,
 `attributes`, optional `geometry`, and `source_url`; original source fields are
 preserved under `attributes`. Responses are limited to 2 MB and 1,000 records.
+For authenticated endpoints, set `REPO_INTELLIGENCE_DATA_HEADERS` to a JSON
+object of HTTP header names and values. Keep credentials in environment
+variables or a secret manager rather than repository files:
+
+```powershell
+$env:REPO_INTELLIGENCE_DATA_HEADERS = '{"Authorization":"Bearer your-token"}'
+```
 
 To connect a local vector/RAG corpus, set `REPO_INTELLIGENCE_RETRIEVER` to a
 Python factory in `module:factory` form. The factory returns an object with
 `search(query, limit=...)`, which returns passages containing `text` and
 `source`, with optional `score` and `metadata`. The MCP exposes this through
-`search_local_knowledge`; the vector store and corpus remain local and are
-implemented by the configured adapter, not by an external MCP server.
+`search_local_knowledge`. `answer_with_local_knowledge` retrieves bounded
+passages, asks the configured AI provider to answer from that evidence, and
+returns the cited source passages with the answer so claims can be checked. It
+requires both a retriever and the optional AI provider configuration above; the
+vector store and corpus remain local and are implemented by the configured
+adapter, not by an external MCP server.
 
 Example configuration:
 
@@ -59,5 +70,5 @@ uv run repo-intelligence-mcp
 ```
 
 The online connector currently fetches one configured JSON endpoint per call;
-source-specific authentication, pagination, and refresh policies belong in a
-connector adapter when the chosen source requires them.
+source-specific pagination and refresh policies belong in a connector adapter
+when the chosen source requires them.
