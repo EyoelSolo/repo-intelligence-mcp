@@ -565,8 +565,9 @@ def search_local_knowledge(query: str, limit: int = 5) -> dict:
         retriever = load_local_retriever()
         if retriever is None:
             return {"error": "No local retriever configured; set REPO_INTELLIGENCE_RETRIEVER."}
-        passages = retriever.search(query.strip(), limit=max(1, min(limit, 20)))
-        passages = [normalize_passage(item) for item in passages]
+        result_limit = max(1, min(limit, 20))
+        passages = retriever.search(query.strip(), limit=result_limit)
+        passages = [normalize_passage(item) for item in passages[:result_limit]]
     except (ImportError, AttributeError, TypeError, ValueError) as exc:
         logger.exception("Local retriever configuration or query failed")
         return {"error": f"Could not query the local retriever: {exc}"}
