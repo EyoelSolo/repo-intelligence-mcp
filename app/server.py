@@ -537,16 +537,17 @@ def ask_ai(prompt: str, file_paths: list[str] | None = None) -> dict:
 
 
 @mcp.tool()
-def fetch_external_records(limit: int = 100) -> dict:
+def fetch_external_records(source: str = "configured-source", limit: int = 100) -> dict:
     """Fetch bounded JSON records from the configured online data source.
 
-    Set REPO_INTELLIGENCE_DATA_URL to an HTTP(S) JSON endpoint. Returned records
-    use a common envelope and retain original source attributes and provenance.
+    Configure one or more sources with REPO_INTELLIGENCE_DATA_SOURCES. Returned
+    records use a common envelope and retain original source attributes/provenance.
     """
-    if not config.data_source_url:
-        return {"error": "Set REPO_INTELLIGENCE_DATA_URL to configure a data source."}
     try:
-        records = HttpJsonSource.from_environment(config.data_source_url).fetch(limit=limit)
+        sources = HttpJsonSource.configured_sources()
+        if source not in sources:
+            return {"error": f"Unknown data source '{source}'. Configured sources: {', '.join(sorted(sources)) or '(none)'}"}
+        records = sources[source].fetch(limit=limit)
     except DataSourceError as exc:
         return {"error": str(exc)}
     return {"count": len(records), "records": [record.to_dict() for record in records]}

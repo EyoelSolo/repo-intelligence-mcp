@@ -36,13 +36,24 @@ Repository-wide symbol definitions, reference candidates, and dependency graphs 
 
 ## External data and local retrieval adapters
 
-Set `REPO_INTELLIGENCE_DATA_URL` to an HTTP(S) JSON endpoint to enable the
-`fetch_external_records` tool. It accepts JSON arrays, common `results`/`data`
+Set `REPO_INTELLIGENCE_DATA_SOURCES` to a JSON object of named source settings
+to enable multiple online connectors. Each source supports its own URL, headers,
+timeout, retry count, and optional page/page-size query parameter names. For
+example:
+
+```powershell
+$env:REPO_INTELLIGENCE_DATA_SOURCES = '{"catalog":{"url":"https://data.example/api/records","timeout":10,"retries":2,"page_param":"page","page_size_param":"limit","max_pages":5},"archive":{"url":"https://archive.example/items","headers":{"Authorization":"Bearer your-token"}}}'
+```
+
+Call `fetch_external_records` with `source="catalog"` or `source="archive"`.
+The legacy `REPO_INTELLIGENCE_DATA_URL` and `REPO_INTELLIGENCE_DATA_HEADERS`
+variables remain supported as the default `configured-source`. The connector
+accepts JSON arrays, common `results`/`data`
 wrappers, single JSON objects, and GeoJSON Features or FeatureCollections. Each
 record is returned in a stable envelope with `id`, `source`, `retrieved_at`,
 `attributes`, optional `geometry`, and `source_url`; original source fields are
 preserved under `attributes`. Responses are limited to 2 MB and 1,000 records.
-For authenticated endpoints, set `REPO_INTELLIGENCE_DATA_HEADERS` to a JSON
+For a single authenticated endpoint, set `REPO_INTELLIGENCE_DATA_HEADERS` to a JSON
 object of HTTP header names and values. Keep credentials in environment
 variables or a secret manager rather than repository files:
 
@@ -69,6 +80,7 @@ $env:REPO_INTELLIGENCE_RETRIEVER = 'my_rag_adapter:create_retriever'
 uv run repo-intelligence-mcp
 ```
 
-The online connector currently fetches one configured JSON endpoint per call;
-source-specific pagination and refresh policies belong in a connector adapter
-when the chosen source requires them.
+Pagination uses bounded page-number query parameters configured per source; at
+most 100 pages and 1,000 records are fetched per call. Network errors, HTTP 429,
+and server errors are retried with a capped delay; numeric `Retry-After` values
+are honored up to 30 seconds. Each response remains limited to 2 MB.
