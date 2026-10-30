@@ -52,9 +52,11 @@ class HttpJsonSource:
                 body = response.read(MAX_RESPONSE_BYTES + 1)
         except HTTPError as exc:
             raise DataSourceError(f"Data source returned HTTP {exc.code}.") from None
-        except (URLError, TimeoutError, OSError) as exc:
-            reason = exc.reason if isinstance(exc, URLError) else exc
-            raise DataSourceError(f"Could not reach data source: {reason}") from None
+        except (URLError, TimeoutError, OSError):
+            # Transport exceptions can include the full URL, including credentials
+            # or API keys embedded in query parameters. Keep diagnostics bounded
+            # and avoid reflecting those values through the MCP response.
+            raise DataSourceError("Could not reach data source (network error or timeout).") from None
 
         if len(body) > MAX_RESPONSE_BYTES:
             raise DataSourceError("Data source response exceeded the 2 MB limit.")
