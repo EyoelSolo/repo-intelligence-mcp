@@ -66,8 +66,9 @@ class OpenAICompatibleClient:
                 result = json.loads(response_body.decode("utf-8"))
         except HTTPError as exc:
             raise AIProviderError(f"AI provider returned HTTP {exc.code}.") from None
-        except (URLError, TimeoutError, OSError) as exc:
-            raise AIProviderError(f"Could not reach the AI provider: {exc.reason if isinstance(exc, URLError) else exc}") from None
+        except (URLError, TimeoutError, OSError):
+            # Transport exception text may include the provider URL and query secrets.
+            raise AIProviderError("Could not reach the AI provider (network error or timeout).") from None
         except (UnicodeError, json.JSONDecodeError):
             raise AIProviderError("AI provider returned an invalid response.") from None
 
