@@ -3,6 +3,8 @@
 import json
 import os
 import time
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -133,7 +135,13 @@ class HttpJsonSource:
                         try:
                             delay = min(30.0, max(delay, float(retry_after)))
                         except (TypeError, ValueError):
-                            pass
+                            try:
+                                retry_at = parsedate_to_datetime(retry_after)
+                                if retry_at.tzinfo is None:
+                                    retry_at = retry_at.replace(tzinfo=timezone.utc)
+                                delay = min(30.0, max(delay, (retry_at - datetime.now(timezone.utc)).total_seconds()))
+                            except (TypeError, ValueError, OverflowError):
+                                pass
                         time.sleep(delay)
                         continue
                     raise DataSourceError(f"Data source returned HTTP {exc.code} after retries.") from None

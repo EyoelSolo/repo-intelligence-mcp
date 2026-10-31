@@ -569,9 +569,9 @@ def search_local_knowledge(query: str, limit: int = 5) -> dict:
         result_limit = max(1, min(limit, 20))
         passages = retriever.search(query.strip(), limit=result_limit)
         passages = [normalize_passage(item) for item in passages[:result_limit]]
-    except (ImportError, AttributeError, TypeError, ValueError) as exc:
+    except Exception as exc:
         logger.exception("Local retriever configuration or query failed")
-        return {"error": f"Could not query the local retriever: {exc}"}
+        return {"error": f"Could not query the local retriever ({type(exc).__name__}). Check the adapter logs and configuration."}
     return {
         "query": query.strip(),
         "count": len(passages),
@@ -595,9 +595,9 @@ def answer_with_local_knowledge(question: str, limit: int = 5) -> dict:
         passages = [normalize_passage(item) for item in passages[:max(1, min(limit, 10))]]
         if not passages:
             return {"question": question.strip(), "answer": "No relevant local evidence was found.", "citations": []}
-    except (ImportError, AttributeError, TypeError, ValueError) as exc:
+    except Exception as exc:
         logger.exception("Local retriever configuration or query failed")
-        return {"error": f"Could not query the local retriever: {exc}"}
+        return {"error": f"Could not query the local retriever ({type(exc).__name__}). Check the adapter logs and configuration."}
 
     citations = [
         {"id": f"S{index}", "source": item.source, "score": item.score, "metadata": item.metadata, "text": item.text}
