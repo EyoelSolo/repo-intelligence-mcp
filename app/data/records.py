@@ -31,8 +31,17 @@ def normalize_record(
     if not isinstance(value, dict):
         raise ValueError("Each source record must be a JSON object.")
 
-    properties = value.get("properties") if value.get("type") == "Feature" else None
-    attributes = properties if isinstance(properties, dict) else value
+    is_feature = value.get("type") == "Feature"
+    properties = value.get("properties") if is_feature else None
+    attributes = dict(properties) if isinstance(properties, dict) else value
+    # GeoJSON permits application-specific members on Features. Keep those
+    # alongside properties so normalization does not discard source metadata.
+    if is_feature:
+        attributes.update(
+            (key, item)
+            for key, item in value.items()
+            if key not in {"type", "id", "geometry", "properties"}
+        )
     identifier = value.get("id", attributes.get("id"))
     geometry = value.get("geometry") if value.get("type") == "Feature" else None
     timestamp = retrieved_at or datetime.now(timezone.utc).isoformat()
