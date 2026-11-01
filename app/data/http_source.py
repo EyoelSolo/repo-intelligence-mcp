@@ -100,11 +100,17 @@ class HttpJsonSource:
             if self.page_param or self.page_size_param:
                 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
                 parts = urlsplit(url)
-                query = dict(parse_qsl(parts.query, keep_blank_values=True))
+                # Keep repeated filters (for example, ``tag=a&tag=b``) intact
+                # when adding or replacing pagination parameters.
+                query = [
+                    (key, value)
+                    for key, value in parse_qsl(parts.query, keep_blank_values=True)
+                    if key not in {self.page_param, self.page_size_param}
+                ]
                 if self.page_param:
-                    query[self.page_param] = str(page)
+                    query.append((self.page_param, str(page)))
                 if self.page_size_param:
-                    query[self.page_size_param] = str(min(limit - len(records), MAX_RECORDS))
+                    query.append((self.page_size_param, str(min(limit - len(records), MAX_RECORDS))))
                 url = urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
             payload = self._request_json(url)
             try:
