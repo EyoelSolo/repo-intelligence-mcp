@@ -72,6 +72,51 @@ requires both a retriever and the optional AI provider configuration above; the
 vector store and corpus remain local and are implemented by the configured
 adapter, not by an external MCP server.
 
+### ChromaDB adapter
+
+The optional built-in Chroma adapter can query a collection indexed by your own
+ingestion script. Install its dependencies with `uv sync --extra rag`, then set
+the database folder, collection name, and the same embedding model used during
+ingestion. For example, in PowerShell:
+
+```powershell
+$env:REPO_INTELLIGENCE_RETRIEVER = 'app.knowledge.chroma_adapter:create_retriever'
+$env:REPO_INTELLIGENCE_CHROMA_PATH = 'C:\path\to\RAG\Data\chroma_db'
+$env:REPO_INTELLIGENCE_CHROMA_COLLECTION = 'estonian_forestry_laws'
+$env:REPO_INTELLIGENCE_EMBEDDING_MODEL = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
+$env:AI_API_KEY = 'ollama'
+$env:AI_MODEL = 'qwen2.5'
+$env:AI_BASE_URL = 'http://localhost:11434/v1'
+uv run repo-intelligence-mcp
+```
+
+The adapter embeds each search query with the configured SentenceTransformer
+model, matching the model used by the example ingestion script. `AI_MODEL` must
+match a model installed in Ollama. The adapter only reads the Chroma collection;
+it does not ingest files or reset the collection.
+
+### Chat directly with Qwen using MCP tools
+
+To have Qwen choose and call MCP tools during a conversation, start the
+interactive client instead of launching the MCP server directly. By default,
+the client uses `~/OneDrive/Desktop/Projects/RAG/Data/chroma_db`, the
+`estonian_forestry_laws` collection, and the embedding model above. Override
+these with the `REPO_INTELLIGENCE_CHROMA_*` and
+`REPO_INTELLIGENCE_EMBEDDING_MODEL` environment variables if your paths differ.
+
+```powershell
+ollama pull qwen3:8b
+uv sync --extra rag
+uv run --extra rag repo-intelligence-qwen
+```
+
+The client connects to Ollama and starts the MCP server as a child process using
+the same Python environment and inherited configuration. Type questions at the
+`You:` prompt; Qwen can call the advertised tools, inspect their results, and
+reply in the same conversation. Enter `/clear` to reset chat history or `/exit`
+to quit. Ollama must be running locally. The first retrieval may also download
+the configured SentenceTransformer embedding model if it is not cached yet.
+
 Example configuration:
 
 ```powershell
