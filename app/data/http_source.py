@@ -70,14 +70,23 @@ class HttpJsonSource:
                     not isinstance(k, str) or not isinstance(v, str) for k, v in headers.items()
                 ):
                     raise DataSourceError(f"Data source '{name}' needs a URL and string header pairs.")
+                page_param = options.get("page_param")
+                page_size_param = options.get("page_size_param")
+                if any(
+                    value is not None and (not isinstance(value, str) or not value.strip())
+                    for value in (page_param, page_size_param)
+                ):
+                    raise DataSourceError(
+                        f"Data source '{name}' pagination parameter names must be nonempty strings."
+                    )
                 try:
                     sources[name] = cls(
                         url, name=name,
                         timeout=float(options.get("timeout", 15)),
                         headers=headers,
                         retries=int(options.get("retries", 2)),
-                        page_param=options.get("page_param"),
-                        page_size_param=options.get("page_size_param"),
+                        page_param=page_param,
+                        page_size_param=page_size_param,
                         start_page=int(options.get("start_page", 1)),
                         max_pages=int(options.get("max_pages", 1)),
                     )
