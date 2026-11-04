@@ -82,7 +82,7 @@ ingestion. For example, in PowerShell:
 ```powershell
 $env:REPO_INTELLIGENCE_RETRIEVER = 'app.knowledge.chroma_adapter:create_retriever'
 $env:REPO_INTELLIGENCE_CHROMA_PATH = 'C:\path\to\RAG\Data\chroma_db'
-$env:REPO_INTELLIGENCE_CHROMA_COLLECTION = 'estonian_forestry_laws'
+$env:REPO_INTELLIGENCE_CHROMA_COLLECTION = 'documents'
 $env:REPO_INTELLIGENCE_EMBEDDING_MODEL = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
 $env:AI_API_KEY = 'ollama'
 $env:AI_MODEL = 'qwen2.5'

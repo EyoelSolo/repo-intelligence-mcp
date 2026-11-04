@@ -85,7 +85,7 @@ def create_retriever() -> ChromaRetriever:
     """Create a retriever for the configured local Chroma collection."""
     path = os.environ.get("REPO_INTELLIGENCE_CHROMA_PATH", str(DEFAULT_CHROMA_PATH)).strip()
     collection_name = os.environ.get(
-        "REPO_INTELLIGENCE_CHROMA_COLLECTION", "estonian_forestry_laws"
+        "REPO_INTELLIGENCE_CHROMA_COLLECTION", "documents"
     ).strip()
     embedding_model_name = os.environ.get(
         "REPO_INTELLIGENCE_EMBEDDING_MODEL",
