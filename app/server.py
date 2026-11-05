@@ -17,7 +17,7 @@ from app.parser.symbol_index import SymbolIndex
 from app.parser.symbol_relationships import SymbolRelationships
 from app.ai.openai_compatible import AIProviderError, OpenAICompatibleClient
 from app.data.http_source import DataSourceError, HttpJsonSource
-from app.knowledge.retriever import load_local_retriever, normalize_passage
+from app.knowledge.retriever import MAX_QUERY_CHARS, load_local_retriever, normalize_passage
 
 
 
@@ -562,6 +562,8 @@ def search_local_knowledge(query: str, limit: int = 5) -> dict:
     """
     if not query.strip():
         return {"error": "Query must not be empty."}
+    if len(query) > MAX_QUERY_CHARS:
+        return {"error": f"Query is limited to {MAX_QUERY_CHARS:,} characters."}
     try:
         retriever = load_local_retriever()
         if retriever is None:
@@ -587,6 +589,8 @@ def answer_with_local_knowledge(question: str, limit: int = 5) -> dict:
     """Answer using retrieved local corpus evidence and return citations for review."""
     if not question.strip():
         return {"error": "Question must not be empty."}
+    if len(question) > MAX_QUERY_CHARS:
+        return {"error": f"Question is limited to {MAX_QUERY_CHARS:,} characters."}
     try:
         retriever = load_local_retriever()
         if retriever is None:

@@ -28,6 +28,7 @@ class LocalRetriever(Protocol):
 
 
 MAX_PASSAGE_CHARS = 8_000
+MAX_QUERY_CHARS = 20_000
 
 
 def normalize_passage(value: Any) -> RetrievedPassage:
