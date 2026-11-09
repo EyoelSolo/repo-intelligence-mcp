@@ -43,12 +43,15 @@ def normalize_passage(value: Any) -> RetrievedPassage:
         raise ValueError("Retriever passage text must be a non-empty string.")
     if not isinstance(passage.source, str) or not passage.source.strip():
         raise ValueError("Retriever passage source must be a non-empty string.")
-    if passage.score is not None and (
-        isinstance(passage.score, bool)
-        or not isinstance(passage.score, (int, float))
-        or not math.isfinite(passage.score)
-    ):
-        raise ValueError("Retriever passage score must be a finite number.")
+    if passage.score is not None:
+        if isinstance(passage.score, bool) or not isinstance(passage.score, (int, float)):
+            raise ValueError("Retriever passage score must be a finite number.")
+        try:
+            finite_score = math.isfinite(passage.score)
+        except OverflowError:
+            finite_score = False
+        if not finite_score:
+            raise ValueError("Retriever passage score must be a finite number.")
     if passage.metadata is not None and not isinstance(passage.metadata, dict):
         raise ValueError("Retriever passage metadata must be an object.")
     passage.text = passage.text[:MAX_PASSAGE_CHARS]
