@@ -6,13 +6,27 @@ import time
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
+from urllib.parse import parse_qsl, urlencode, urlparse, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 
 from app.data.records import DataRecord, normalize_payload
 
 MAX_RESPONSE_BYTES = 2_000_000
 MAX_RECORDS = 1_000
+SENSITIVE_QUERY_KEYS = {"access_token", "api_key", "apikey", "auth", "key", "password", "secret", "token"}
+
+
+def _public_source_url(url: str) -> str:
+    """Remove credentials from source provenance before returning records."""
+    parts = urlsplit(url)
+    host = parts.hostname or ""
+    if parts.port:
+        host = f"{host}:{parts.port}"
+    query = urlencode([
+        (key, "REDACTED" if key.casefold() in SENSITIVE_QUERY_KEYS else value)
+        for key, value in parse_qsl(parts.query, keep_blank_values=True)
+    ])
+    return urlunsplit((parts.scheme, host, parts.path, query, parts.fragment))
 
 
 class DataSourceError(RuntimeError):
@@ -123,7 +137,7 @@ class HttpJsonSource:
                 url = urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
             payload = self._request_json(url)
             try:
-                batch = normalize_payload(payload, source=self.name, source_url=self.url)
+                batch = normalize_payload(payload, source=self.name, source_url=_public_source_url(self.url))
             except ValueError as exc:
                 raise DataSourceError(f"Data source returned invalid records: {exc}") from None
             records.extend(batch[:remaining])
