@@ -114,11 +114,17 @@ async def _chat(model: str, ollama_url: str, server_env: dict[str, str]) -> None
             messages: list[dict[str, Any]] = [{
                 "role": "system",
                 "content": (
-                    "You are Qwen, chatting directly with the user. Use the connected MCP tools "
-                    "when repository files, external records, or local knowledge are needed. "
-                    "For questions about the local corpus, use search_local_knowledge to retrieve "
-                    "evidence, then answer from those passages and identify their sources. "
-                    "If evidence is missing, say so. Never claim a tool succeeded unless its result confirms it."
+                    "You are Qwen, chatting directly with the user. The local Chroma knowledge "
+                    "corpus contains the user's legal documents; it is separate from the code "
+                    "repository and configured websites. For every question about law, permits, "
+                    "forestry, environmental assessment, or court decisions, call "
+                    "search_local_knowledge before answering. Do not use list_files or "
+                    "fetch_external_records as substitutes for legal-corpus search, and do not "
+                    "infer what legal texts the corpus contains from repository files. Answer "
+                    "from retrieved passages, identify their source metadata, and say when the "
+                    "search returns no relevant evidence. Use other MCP tools only when the user "
+                    "asks about repository code or configured external data. Never claim a tool "
+                    "succeeded unless its result confirms it."
                 ),
             }]
 
